@@ -1,0 +1,30 @@
+﻿@model User
+@{
+    Layout = null;
+    User user = Model;
+}
+@if (Model == null)
+{
+    <h3>FAIL</h3>
+}
+else
+{
+    @:user;
+    <h3>@user.UserId# @user.Username</h3>
+    <br />
+
+    @:Profile:
+    @:name: <h4>@user.Profile?.FirstName @user.Profile?.LastName</h4>
+    @:university: <h4>@user.Profile?.University</h4>
+    @:email:<h4>@user.Profile?.Email</h4>
+    <br />
+    @:friends:
+    if (user.Profile?.Friends != null)
+    {
+        foreach (var friend in user.Profile?.Friends)
+        {
+            <h5>@friend.FriendId</h5>
+        }
+    }
+
+}
