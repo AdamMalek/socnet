@@ -15,6 +15,13 @@ namespace socnet.Data
         public DbSet<Role> Roles { get; set; }
         public DbSet<Invite> Invites { get; set; }
 
+        public DbSet<Group> Groups { get; set; }
+        public DbSet<Post> Posts { get; set; }
+        public DbSet<Comment> Comments { get; set; }
+        public DbSet<Rate> Rates { get; set; }
+        public DbSet<Member> Members { get; set; }
+
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options):base(options)
         {
         }
@@ -25,6 +32,7 @@ namespace socnet.Data
             // Customize the ASP.NET Identity model and override the defaults if needed.
             // For example, you can rename the ASP.NET Identity table names and more.
             // Add your customizations after calling base.OnModelCreating(builder);
+            
         }
     }
 }
