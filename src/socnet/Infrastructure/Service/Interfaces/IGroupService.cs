@@ -10,8 +10,8 @@ namespace socnet.Infrastructure.Service.Interfaces
 {
     public interface IGroupService
     {
-        Group GetGroupById(int id);
-        Group GetGroupBySlug(string slug);
+        Group GetGroupById(int id,string[] scope = null);
+        Group GetGroupBySlug(string slug, string[] scope = null);
         IEnumerable<Group> GetUsersGroups(int profileId);
         bool IsUserAdmin(int profileId, int groupId);
         bool IsUserAdmin(int profileId, string slug);
@@ -35,7 +35,7 @@ namespace socnet.Infrastructure.Service.Interfaces
         IEnumerable<Profile> GetMembersWithRole(int id, MembershipLevel role);
         IEnumerable<Profile> GetMembersWithRole(string slug, MembershipLevel role);
 
-
-
+        IEnumerable<Post> GetPosts(int groupId, int count, int skip, Expression<Func<Post,object>> orderBy ,Expression<Func<Post, bool>> predicate = null);
+        IEnumerable<Post> GetPosts(string slug, int count, int skip, Expression<Func<Post,object>> orderBy ,Expression<Func<Post, bool>> predicate = null);
     }
 }

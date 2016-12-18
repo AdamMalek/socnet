@@ -14,5 +14,8 @@ namespace socnet.Infrastructure.Repositoty.Interfaces
         IEnumerable<Group> GetGroups(Expression<Func<Group, bool>> predicate, params Expression<Func<Group, object>>[] includes);
         bool DeleteGroup(int groupId);
         Group UpdateGroup(Group group);
+        Group CreateGroup(Group group);
+
+        IEnumerable<Member> GetMembers(Expression<Func<Member, bool>> predicate);
     }
 }
