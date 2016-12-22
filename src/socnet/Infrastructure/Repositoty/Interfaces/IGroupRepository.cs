@@ -16,6 +16,6 @@ namespace socnet.Infrastructure.Repositoty.Interfaces
         Group UpdateGroup(Group group);
         Group CreateGroup(Group group);
 
-        IEnumerable<Member> GetMembers(Expression<Func<Member, bool>> predicate);
+        IEnumerable<Member> GetMembers(Expression<Func<Member, bool>> predicate, params Expression<Func<Member, object>>[] includes);
     }
 }

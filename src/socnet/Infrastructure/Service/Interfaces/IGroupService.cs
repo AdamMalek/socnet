@@ -13,18 +13,8 @@ namespace socnet.Infrastructure.Service.Interfaces
         Group GetGroupById(int id,string[] scope = null);
         Group GetGroupBySlug(string slug, string[] scope = null);
         IEnumerable<Group> GetUsersGroups(int profileId);
-        bool IsUserAdmin(int profileId, int groupId);
-        bool IsUserAdmin(int profileId, string slug);
 
         Group CreateGroup(string name, int ownerId, string slug = null);
-        bool AddMember(int groupId, int profileId, MembershipLevel role = MembershipLevel.User);
-        bool AddMember(string slug, int profileId, MembershipLevel role = MembershipLevel.User);
-        bool AddMembers(int groupId, IEnumerable<AddMemberVM> profiles);
-        bool AddMembers(string slug, IEnumerable<AddMemberVM> profiles);
-        bool RemoveMember(int groupId, int profileId);
-        bool RemoveMember(string slug, int profileId);
-        bool RemoveMembers(int groupId, IEnumerable<int> profiles);
-        bool RemoveMembers(string slug, IEnumerable<int> profiles);
 
         bool SetSlug(int groupId, string slug);
         bool SetName(int groupId, string newName);

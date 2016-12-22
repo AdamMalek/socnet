@@ -13,74 +13,16 @@ namespace socnet.Infrastructure.Service
     public class GroupService : IGroupService
     {
         private readonly IGroupRepository _groupRepository;
-        private readonly IProfileService _profileService;
+        private readonly IMemberService _memberService;
+        private readonly IPostRepository _postRepository;
+        private readonly IProfileService _profileService; 
 
-        public GroupService(IGroupRepository groupRepository, IProfileService profileService)
+        public GroupService(IGroupRepository groupRepository, IProfileService profileService, IMemberService memberService, IPostRepository postRepository)
         {
+            _memberService = memberService;
+            _postRepository = postRepository;
             _profileService = profileService;
             _groupRepository = groupRepository;
-        }
-        public bool AddMember(string slug, int profileId, MembershipLevel role = MembershipLevel.User)
-        {
-            var group = GetGroupBySlug(slug, "members");
-            return AddMember(group, profileId, role);
-        }
-
-        public bool AddMember(int groupId, int profileId, MembershipLevel role = MembershipLevel.User)
-        {
-            var group = GetGroupById(groupId, "members");
-            return AddMember(group, profileId, role);
-        }
-
-        private bool AddMember(Group group, int profileId, MembershipLevel role = MembershipLevel.User)
-        {
-            if (group == null) return false;
-            var user = _profileService.GetProfileById(profileId);
-            if (user == null) return false;
-            if (group.Members.Select(x => x.ProfileId).Contains(profileId)) return false;
-            group.Members.Add(new Member { Profile = user, Role = role });
-            _groupRepository.UpdateGroup(group);
-            return true;
-        }
-
-        public bool AddMembers(string slug, IEnumerable<AddMemberVM> profiles)
-        {
-            var group = GetGroupBySlug(slug, "members");
-            return AddMembers(group, profiles);
-        }
-
-        public bool AddMembers(int groupId, IEnumerable<AddMemberVM> profiles)
-        {
-            var group = GetGroupById(groupId, "members");
-            return AddMembers(group, profiles);
-        }
-
-        private bool AddMembers(Group group, IEnumerable<AddMemberVM> profiles)
-        {
-            if (group == null) return false;
-            if (profiles == null) return false;
-            var membersIds = group.Members.Select(x => x.ProfileId).ToList();
-            var distinctIds = profiles.Select(x => x.ProfileId).Except(membersIds);
-
-            var newMembers = profiles.Where(x => distinctIds.Contains(x.ProfileId));
-
-            foreach (var newMember in newMembers)
-            {
-                var usr = _profileService.GetProfileById(newMember.ProfileId);
-                if (usr != null)
-                {
-                    group.Members.Add(new Member { ProfileId = newMember.ProfileId, Role = newMember.Role });
-                }
-            }
-            try
-            {
-                _groupRepository.UpdateGroup(group);
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
         }
 
         public Group CreateGroup(string name, int ownerId, string slug = null)
@@ -184,20 +126,12 @@ namespace socnet.Infrastructure.Service
 
         public IEnumerable<Profile> GetMembers(string slug)
         {
-            var group = GetGroupBySlug(slug, "members");
-            return GetMembers(group);
+            return _memberService.GetMembers(x => x.Group.GroupSlug == slug,x=> x.Group).Select(x=> x.Profile);
         }
 
         public IEnumerable<Profile> GetMembers(int id)
         {
-            var group = GetGroupById(id, "members");
-            return GetMembers(group);
-        }
-
-        IEnumerable<Profile> GetMembers(Group group)
-        {
-            if (group == null) return null;
-            return group.Members.Select(x => x.Profile).AsEnumerable();
+            return _memberService.GetGroupMembers(id).Select(x=> x.Profile);
         }
 
         public IEnumerable<Profile> GetMembersWithRole(string slug, MembershipLevel role)
@@ -216,78 +150,13 @@ namespace socnet.Infrastructure.Service
         {
             if (group == null) return null;
 
-            return group.Members.Where(x => x.Role == role).Select(x => x.Profile).AsEnumerable();
+            return _memberService.GetMembers(x=> x.GroupId == group.GroupId && x.Role == role).Select(x => x.Profile);
         }
 
         public IEnumerable<Group> GetUsersGroups(int profileId)
         {
-            var memberships = _groupRepository.GetMembers(x => x.MemberId == profileId);
+            var memberships = _memberService.GetMembers(x=> x.ProfileId == profileId,x=> x.Group);
             return memberships.Select(x => x.Group).AsEnumerable();
-        }
-
-        public bool IsUserAdmin(int profileId, string slug)
-        {
-            var group = GetGroupBySlug(slug, "members");
-            return IsUserAdmin(profileId, group);
-        }
-
-        public bool IsUserAdmin(int profileId, int groupId)
-        {
-            var group = GetGroupById(groupId, "members");
-            return IsUserAdmin(profileId, group);
-        }
-
-        public bool IsUserAdmin(int profileId, Group group)
-        {
-            if (group == null) return false;
-            var membership = group.Members.FirstOrDefault(x => x.ProfileId == profileId);
-
-            return membership != null && membership.Role == MembershipLevel.Admin;
-        }
-
-        public bool RemoveMember(string slug, int profileId)
-        {
-            var group = GetGroupBySlug(slug, "members");
-            return RemoveMember(group, profileId);
-        }
-
-        public bool RemoveMember(int groupId, int profileId)
-        {
-            var group = GetGroupById(groupId, "member");
-            return RemoveMember(group, profileId);
-        }
-
-        bool RemoveMember(Group group, int profileId)
-        {
-            if (group == null || group.Members.Count == 1) return false;
-
-            var membership = group.Members.FirstOrDefault(x => x.ProfileId == profileId);
-            if (membership == null) return false;
-
-            if (membership.Role == MembershipLevel.Admin
-                && GetMembersWithRole(group, MembershipLevel.Admin).Count() == 1) return false;
-
-            group.Members.Remove(membership);
-            _groupRepository.UpdateGroup(group);
-
-            return true;
-        }
-
-        public bool RemoveMembers(string slug, IEnumerable<int> profiles)
-        {
-            var group = GetGroupBySlug(slug, "members");
-            return RemoveMembers(group, profiles);
-        }
-
-        public bool RemoveMembers(int groupId, IEnumerable<int> profiles)
-        {
-            var group = GetGroupById(groupId, "member");
-            return RemoveMembers(group, profiles);
-        }
-
-        bool RemoveMembers(Group group, IEnumerable<int> profiles)
-        {
-            throw new NotImplementedException();
         }
 
         public bool SetName(string slug, string newName)

@@ -79,10 +79,17 @@ namespace socnet
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IUserService, UserService>();
 
+            services.AddTransient<IGroupRepository, GroupRepository>();
+            services.AddTransient<IGroupService, GroupService>();
+
             services.AddTransient<IProfileRepository, ProfileRepository>();
             services.AddTransient<IProfileService, ProfileService>();
 
+            services.AddTransient<IMemberRepository, MemberRepository>();
+            services.AddTransient<IMemberService, MemberService>();
+
             services.AddTransient<IInviteRepository, InviteRepository>();
+            services.AddTransient<IPostRepository, PostRepository>();
 
             services.Configure<ConfigClass>(Configuration);
         }

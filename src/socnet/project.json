@@ -45,7 +45,8 @@
       "type": "build"
     },
     "System.IdentityModel.Tokens.Jwt": "5.0.0",
-    "Microsoft.AspNetCore.Authentication.JwtBearer": "1.0.0"
+    "Microsoft.AspNetCore.Authentication.JwtBearer": "1.0.0",
+    "Microsoft.EntityFrameworkCore": "1.0.1"
   },
 
   "tools": {

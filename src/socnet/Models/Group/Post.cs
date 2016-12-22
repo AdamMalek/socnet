@@ -12,5 +12,7 @@ namespace socnet.Models
         public int GroupId { get; set; }
         [ForeignKey(nameof(GroupId))]
         public Group Group { get; set; }
+
+        public List<Comment> Comments { get; set; }
     }
 }
