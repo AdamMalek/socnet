@@ -6,7 +6,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-namespace socnet.Infrastructure.Repositoty.Interfaces
+namespace socnet.Infrastructure.Repository.Interfaces
 {
     public interface IMemberRepository
     {

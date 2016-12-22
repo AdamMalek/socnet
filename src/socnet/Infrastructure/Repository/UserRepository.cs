@@ -5,11 +5,11 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using socnet.Data;
-using socnet.Infrastructure.Repositoty.Interfaces;
+using socnet.Infrastructure.Repository.Interfaces;
 using socnet.Models;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
-namespace socnet.Infrastructure.Repositoty
+namespace socnet.Infrastructure.Repository
 {
     public class UserRepository : IUserRepository
     {

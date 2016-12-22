@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using socnet.Models;
 
-namespace socnet.Infrastructure.Repositoty.Interfaces
+namespace socnet.Infrastructure.Repository.Interfaces
 {
     public interface IUserRepository
     {

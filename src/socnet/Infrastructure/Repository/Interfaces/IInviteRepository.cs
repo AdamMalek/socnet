@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using socnet.Models;
 
-namespace socnet.Infrastructure.Repositoty.Interfaces
+namespace socnet.Infrastructure.Repository.Interfaces
 {
     public interface IInviteRepository
     {

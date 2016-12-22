@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace socnet.Models.DTO
 {
-    public class AddMemberVM
+    public class AddMemberDTO
     {
         public int ProfileId { get; set; }
         public MembershipLevel Role { get; set; }

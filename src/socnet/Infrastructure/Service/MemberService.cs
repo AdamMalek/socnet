@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using socnet.Models;
 using socnet.Models.DTO;
 using System.Linq.Expressions;
-using socnet.Infrastructure.Repositoty.Interfaces;
+using socnet.Infrastructure.Repository.Interfaces;
 
 namespace socnet.Infrastructure.Service
 {

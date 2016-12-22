@@ -15,8 +15,8 @@ using Microsoft.IdentityModel.Tokens;
 using socnet.Config;
 using socnet.Data;
 using socnet.Infrastructure.Middleware;
-using socnet.Infrastructure.Repositoty;
-using socnet.Infrastructure.Repositoty.Interfaces;
+using socnet.Infrastructure.Repository;
+using socnet.Infrastructure.Repository.Interfaces;
 using socnet.Infrastructure.Service;
 using socnet.Infrastructure.Service.Interfaces;
 using socnet.Models;
@@ -88,8 +88,11 @@ namespace socnet
             services.AddTransient<IMemberRepository, MemberRepository>();
             services.AddTransient<IMemberService, MemberService>();
 
-            services.AddTransient<IInviteRepository, InviteRepository>();
+            services.AddTransient<ICommentRepository, CommentRepository>();
             services.AddTransient<IPostRepository, PostRepository>();
+            services.AddTransient<IPostService, PostService>();
+
+            services.AddTransient<IInviteRepository, InviteRepository>();
 
             services.Configure<ConfigClass>(Configuration);
         }

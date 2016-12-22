@@ -15,6 +15,7 @@ namespace socnet.Models
         public string Body { get; set; }
         [Required]
         public DateTime DateCreated { get; set; } = DateTime.UtcNow;
+        public DateTime LastModified { get; set; } = DateTime.UtcNow;
 
         public List<Rate> Rating { get; set; }
         public int ProfileId { get; set; }

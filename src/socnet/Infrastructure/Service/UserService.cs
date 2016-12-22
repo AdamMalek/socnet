@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.ApplicationInsights.AspNetCore.TelemetryInitializers;
 using Microsoft.Extensions.Options;
 using socnet.Config;
-using socnet.Infrastructure.Repositoty.Interfaces;
+using socnet.Infrastructure.Repository.Interfaces;
 using socnet.Infrastructure.Service.Interfaces;
 using socnet.Models;
 

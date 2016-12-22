@@ -1,4 +1,4 @@
-﻿using socnet.Infrastructure.Repositoty.Interfaces;
+﻿using socnet.Infrastructure.Repository.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +8,7 @@ using System.Linq.Expressions;
 using socnet.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace socnet.Infrastructure.Repositoty
+namespace socnet.Infrastructure.Repository
 {
     public class PostRepository : IPostRepository
     {
@@ -53,7 +53,7 @@ namespace socnet.Infrastructure.Repositoty
                             .Include(x => x.Comments)
                                 .ThenInclude(x => x.Rating)
                             .Include(x => x.Profile)
-                            .Include(x=> x.Group)
+                            .Include(x => x.Group)
                     .FirstOrDefault(x => x.Id == postId);
         }
 
@@ -88,7 +88,9 @@ namespace socnet.Infrastructure.Repositoty
 
         public Post UpdatePost(Post post)
         {
-            throw new NotImplementedException();
+            _db.Entry(post).State = EntityState.Modified;
+            _db.SaveChanges();
+            return post;
         }
     }
 }

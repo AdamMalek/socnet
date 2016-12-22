@@ -4,10 +4,10 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using socnet.Data;
-using socnet.Infrastructure.Repositoty.Interfaces;
+using socnet.Infrastructure.Repository.Interfaces;
 using socnet.Models;
 
-namespace socnet.Infrastructure.Repositoty
+namespace socnet.Infrastructure.Repository
 {
     public class InviteRepository : IInviteRepository
     {

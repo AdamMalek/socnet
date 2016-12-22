@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using NuGet.Protocol.Core.Types;
-using socnet.Infrastructure.Repositoty.Interfaces;
+using socnet.Infrastructure.Repository.Interfaces;
 using socnet.Infrastructure.Service.Interfaces;
 using socnet.Models;
 

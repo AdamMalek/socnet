@@ -5,14 +5,14 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-namespace socnet.Infrastructure.Repositoty.Interfaces
+namespace socnet.Infrastructure.Repository.Interfaces
 {
     public interface IPostRepository
     {
         IEnumerable<Post> GetPostsForGroup(int groupId, params Expression<Func<Post, object>>[] includes);
         IEnumerable<Post> GetPostsForGroupWhere(int groupId,Expression<Func<Post,bool>> predicate, params Expression<Func<Post, object>>[] includes);
         IEnumerable<Post> GetPostsWhere(Expression<Func<Post,bool>> predicate, params Expression<Func<Post, object>>[] includes);
-        Post GetPostById(int postId);
+        Post GetPostById(int postId, params Expression<Func<Post, object>>[] includes);
 
         Post CreatePost(Post post);
         Post UpdatePost(Post post);
