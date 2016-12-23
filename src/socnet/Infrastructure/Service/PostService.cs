@@ -15,19 +15,24 @@ namespace socnet.Infrastructure.Service
         private readonly IPostRepository _postRepository;
         private readonly IProfileRepository _profileRepository;
         private readonly IGroupRepository _groupRepository;
+        private readonly IMemberService _memberService;
 
-        public PostService(IPostRepository postRepo, ICommentRepository commentRepo, IProfileRepository profileRepo, IGroupRepository groupRepo)
+        public PostService(IPostRepository postRepo,
+            ICommentRepository commentRepo,
+            IProfileRepository profileRepo,
+            IGroupRepository groupRepo,
+            IMemberService memberService)
         {
             _postRepository = postRepo;
             _commentRepository = commentRepo;
             _profileRepository = profileRepo;
             _groupRepository = groupRepo;
+            _memberService = memberService;
         }
         public CommentDTO CommentPost(CommentDTO comment)
         {
-            if ((_profileRepository.GetProfileByPredicate(x => x.ProfileId == comment.ProfileId) == null) ||
-                (_postRepository.GetPostById(comment.PostId) == null)) return null;
-
+            var post = GetPostById(comment.Id);
+            if (post == null || !_memberService.IsMember(comment.ProfileId, post.GroupId)) return null;
             Comment newComment = fromDTO(comment);
             newComment.Rating = new List<Rate>();
             var comm = _commentRepository.AddComment(newComment);
@@ -36,12 +41,21 @@ namespace socnet.Infrastructure.Service
 
         public PostDTO CreatePost(PostDTO post)
         {
-            throw new NotImplementedException();
+            if (!_memberService.IsMember(post.ProfileId, post.GroupId) ||
+                (_groupRepository.GetById(post.GroupId) == null))
+                return null;
+
+            Post newPost = fromDTO(post);
+            if (newPost != null)
+            {
+                newPost = _postRepository.CreatePost(newPost);
+            }
+            return toDTO(newPost);
         }
 
         public bool DeleteComment(int commentId)
         {
-            throw new NotImplementedException();
+            return _commentRepository.DeleteComment(commentId);
         }
 
         public bool DeletePost(int postId)
@@ -52,6 +66,7 @@ namespace socnet.Infrastructure.Service
         public CommentDTO EditComment(int commentId, string newMessage)
         {
             var comm = _commentRepository.GetCommentById(commentId);
+            if (comm == null) return null;
             comm.Body = newMessage;
             comm.LastModified = DateTime.UtcNow;
             _commentRepository.UpdateComment(comm);
@@ -60,42 +75,85 @@ namespace socnet.Infrastructure.Service
 
         public PostDTO EditPost(int postId, string newMessage)
         {
-            throw new NotImplementedException();
+            var post = _postRepository.GetPostById(postId);
+            if (post == null) return null;
+            post.Body = newMessage;
+            post.LastModified = DateTime.UtcNow;
+            post = _postRepository.UpdatePost(post);
+            return toDTO(post);
         }
 
         public IEnumerable<CommentDTO> GetComments(int postId)
         {
-            throw new NotImplementedException();
+            return _commentRepository.GetCommentsByQuery(x => x.PostId == postId).Select(x => toDTO(x));
         }
 
         public PostDTO GetPostById(int postId)
         {
-            throw new NotImplementedException();
+            var post = _postRepository.GetPostById(postId);
+            return toDTO(post);
         }
 
         public IEnumerable<PostDTO> GetPostsByGroup(string slug)
         {
-            throw new NotImplementedException();
+            var posts = _postRepository.GetPostsWhere(x => x.Group.GroupSlug == slug);
+            return posts.Select(x => toDTO(x));
         }
 
         public IEnumerable<PostDTO> GetPostsByGroup(int groupId)
         {
-            throw new NotImplementedException();
+            return _postRepository.GetPostsForGroup(groupId).Select(x => toDTO(x));
         }
 
         public IEnumerable<PostDTO> GetPostsByUser(int profileId)
         {
-            throw new NotImplementedException();
+            return _postRepository.GetPostsWhere(x => x.ProfileId == profileId).Select(x => toDTO(x));
         }
 
         public bool RateComment(int commentId, int profileId, RateType vote)
         {
-            throw new NotImplementedException();
+            var comm = _commentRepository.GetCommentById(commentId, x => x.Post, x => x.Rating);
+            if ((comm == null) ||
+                (!_memberService.IsMember(profileId, comm.Post.GroupId))) return false;
+
+            var rate = comm.Rating.FirstOrDefault(x => x.ProfileId == profileId);
+            if (rate != null && rate.Value != vote)
+            {
+                rate.Value = vote;
+            }
+            else if (rate == null)
+            {
+                Rate r = new Rate
+                {
+                    ProfileId = profileId,
+                    Value = vote
+                };
+                comm.Rating.Add(r);
+            }
+            return _commentRepository.UpdateComment(comm) != null;
         }
 
         public bool RatePost(int postId, int profileId, RateType vote)
         {
-            throw new NotImplementedException();
+            var post = _postRepository.GetPostById(postId);
+            if ((post == null) ||
+                (!_memberService.IsMember(profileId, post.GroupId))) return false;
+
+            var rate = post.Rating.FirstOrDefault(x => x.ProfileId == profileId);
+            if (rate != null && rate.Value != vote)
+            {
+                rate.Value = vote;
+            }
+            else if (rate == null)
+            {
+                Rate r = new Rate
+                {
+                    ProfileId = profileId,
+                    Value = vote
+                };
+                post.Rating.Add(r);
+            }
+            return _postRepository.UpdatePost(post) != null;
         }
 
         private Comment fromDTO(CommentDTO dto)
@@ -108,7 +166,8 @@ namespace socnet.Infrastructure.Service
                 Id = dto.Id,
             };
         }
-        private CommentDTO toDTO(Comment comm) {
+        private CommentDTO toDTO(Comment comm)
+        {
             var dto = new CommentDTO
             {
                 Id = comm.Id,
@@ -124,7 +183,36 @@ namespace socnet.Infrastructure.Service
             }
             return dto;
         }
-        private Post fromDTO(PostDTO dto) { }
-        private PostDTO toDTO(Post comm) { }
+        private Post fromDTO(PostDTO dto)
+        {
+            return new Post
+            {
+                ProfileId = dto.ProfileId,
+                GroupId = dto.GroupId,
+                Body = dto.Content,
+                Id = dto.Id,
+            };
+        }
+        private PostDTO toDTO(Post post)
+        {
+            var dto = new PostDTO
+            {
+                Id = post.Id,
+                GroupId = post.GroupId,
+                ProfileId = post.ProfileId,
+                Content = post.Body,
+            };
+            if (post.Rating != null)
+            {
+                var ups = post.Rating.Count(x => x.Value == RateType.UpVote);
+                var downs = post.Rating.Count(x => x.Value == RateType.DownVote);
+                dto.Rating = ups - downs;
+            }
+            foreach (var comment in post?.Comments)
+            {
+                dto.Comments.Add(toDTO(comment));
+            }
+            return dto;
+        }
     }
 }

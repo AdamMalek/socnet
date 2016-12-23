@@ -57,33 +57,33 @@ namespace socnet.Infrastructure.Repository
                     .FirstOrDefault(x => x.Id == postId);
         }
 
-        public IEnumerable<Post> GetPostsForGroup(int groupId, params Expression<Func<Post, object>>[] includes)
+        public IEnumerable<Post> GetPostsForGroup(int groupId)
         {
-            IQueryable<Post> query = _db.Posts;
-            foreach (var inc in includes)
-            {
-                query = query.Include(inc);
-            }
-            return query.Where(x => x.GroupId == groupId).AsEnumerable();
+            return _db.Posts.Include(x => x.Rating)
+                            .Include(x => x.Comments)
+                                .ThenInclude(x => x.Rating)
+                            .Include(x => x.Profile)
+                            .Include(x => x.Group)
+                    .Where(x => x.GroupId == groupId).AsEnumerable();
         }
 
-        public IEnumerable<Post> GetPostsForGroupWhere(int groupId, Expression<Func<Post, bool>> predicate, params Expression<Func<Post, object>>[] includes)
+        public IEnumerable<Post> GetPostsForGroupWhere(int groupId, Expression<Func<Post, bool>> predicate)
         {
-            IQueryable<Post> query = _db.Posts;
-            foreach (var inc in includes)
-            {
-                query = query.Include(inc);
-            }
-            return query.Where(x => x.GroupId == groupId).Where(predicate).AsEnumerable();
+            return _db.Posts.Include(x => x.Rating)
+                            .Include(x => x.Comments)
+                                .ThenInclude(x => x.Rating)
+                            .Include(x => x.Profile)
+                            .Include(x => x.Group)
+                    .Where(x => x.GroupId == groupId).Where(predicate).AsEnumerable();
         }
-        public IEnumerable<Post> GetPostsWhere(Expression<Func<Post, bool>> predicate, params Expression<Func<Post, object>>[] includes)
+        public IEnumerable<Post> GetPostsWhere(Expression<Func<Post, bool>> predicate)
         {
-            IQueryable<Post> query = _db.Posts;
-            foreach (var inc in includes)
-            {
-                query = query.Include(inc);
-            }
-            return query.Where(predicate).AsEnumerable();
+            return _db.Posts.Include(x => x.Rating)
+                            .Include(x => x.Comments)
+                                .ThenInclude(x => x.Rating)
+                            .Include(x => x.Profile)
+                            .Include(x => x.Group)
+                    .Where(predicate).AsEnumerable();
         }
 
         public Post UpdatePost(Post post)

@@ -11,6 +11,7 @@ namespace socnet.Infrastructure.Service.Interfaces
     public interface IGroupService
     {
         Group GetGroupById(int id,string[] scope = null);
+        int? GetIdBySlug(string slug);
         Group GetGroupBySlug(string slug, string[] scope = null);
         IEnumerable<Group> GetUsersGroups(int profileId);
 

@@ -40,10 +40,11 @@ namespace socnet.Infrastructure.Service
                 };
                 if (slug != null)
                 {
+                    slug = sanitizeInput(slug).Replace("-", "");
                     var gr = GetGroupBySlug(slug);
-                    if (gr != null)
+                    if (gr == null)
                     {
-                        newGroup.GroupSlug = sanitizeInput(slug).Replace("-", "");
+                        newGroup.GroupSlug = slug;
                     }
                 }
                 try
@@ -225,5 +226,10 @@ namespace socnet.Infrastructure.Service
         }
 
         private string sanitizeInput(string input) => input.Trim().Replace("\r", "").Replace("\n", "").Replace("\t", "");
+
+        public int? GetIdBySlug(string slug)
+        {
+            return _groupRepository.GetBySlug(slug)?.GroupId;
+        }
     }
 }

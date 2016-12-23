@@ -9,10 +9,10 @@ namespace socnet.Infrastructure.Repository.Interfaces
 {
     public interface IPostRepository
     {
-        IEnumerable<Post> GetPostsForGroup(int groupId, params Expression<Func<Post, object>>[] includes);
-        IEnumerable<Post> GetPostsForGroupWhere(int groupId,Expression<Func<Post,bool>> predicate, params Expression<Func<Post, object>>[] includes);
-        IEnumerable<Post> GetPostsWhere(Expression<Func<Post,bool>> predicate, params Expression<Func<Post, object>>[] includes);
-        Post GetPostById(int postId, params Expression<Func<Post, object>>[] includes);
+        IEnumerable<Post> GetPostsForGroup(int groupId);
+        IEnumerable<Post> GetPostsForGroupWhere(int groupId,Expression<Func<Post,bool>> predicate);
+        IEnumerable<Post> GetPostsWhere(Expression<Func<Post,bool>> predicate);
+        Post GetPostById(int postId);
 
         Post CreatePost(Post post);
         Post UpdatePost(Post post);

@@ -124,7 +124,7 @@ namespace socnet
             {
                 Audience = "users",
                 Issuer = "me",
-                Expiration = TimeSpan.FromSeconds(60),
+                Expiration = TimeSpan.FromDays(3),
                 Path = "/login",
                 SigningCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256),
                 //IdentityResolver = GetIdentity
