@@ -4,42 +4,148 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using socnet.Infrastructure.Service.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using socnet.Models.DTO;
+
 namespace socnet.Controllers
 {
     [Produces("application/json")]
     [Route("api/group/{groupId:int}/posts", Name = "PostId")]
     [Route("api/group/{slug}/posts", Name = "PostSlug")]
+    [Authorize]
     public class PostsController : Controller
     {
+        private readonly IGroupService _groupService;
+        private readonly IPostService _postService;
+        private readonly IMemberService _memberService;
+        private int ProfileId
+        {
+            get
+            {
+                try
+                {
+                    return Convert.ToInt32(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "profileId").Value);
+                }
+                catch
+                {
+                    return -1;
+                }
+            }
+        }
+        public PostsController(IGroupService groupService, IPostService postService, IMemberService memberService)
+        {
+            _groupService = groupService;
+            _postService = postService;
+            _memberService = memberService;
+        }
         // GET: api/Posts
         [HttpGet]
-        public IEnumerable<string> Get()
+        public IEnumerable<PostDTO> Get(string slug, int? groupId)
         {
-            return new string[] { "value1", "value2" };
+            if (slug != null)
+            {
+                groupId = _groupService.GetIdBySlug(slug);
+            }
+            if (!groupId.HasValue)
+            {
+                Response.StatusCode = 404;
+                Response.WriteAsync("Error, group doesn't exist");
+                return null;
+            }
+            if (!_memberService.IsMember(ProfileId, groupId.Value))
+            {
+                Response.StatusCode = 403;
+                Response.WriteAsync("You are not a member of this group");
+                return null;
+            }
+            return _postService.GetPostsByGroup(groupId.Value);
         }
 
         // GET: api/Posts/5
         [HttpGet("{postId}")]
-        public string Get(string slug,int? groupId, int postId)
+        public PostDTO Get(string slug,int? groupId, int postId)
         {
-            return groupId.ToString() + " " + postId.ToString();
+            if (slug != null)
+            {
+                groupId = _groupService.GetIdBySlug(slug);
+            }
+            if (!groupId.HasValue)
+            {
+                Response.StatusCode = 404;
+                Response.WriteAsync("Error, group doesn't exist");
+                return null;
+            }
+            if (!_memberService.IsMember(ProfileId, groupId.Value))
+            {
+                Response.StatusCode = 403;
+                Response.WriteAsync("You are not a member of this group");
+                return null;
+            }
+            return _postService.GetPostById(postId);
         }
         // POST: api/Posts
         [HttpPost]
-        public void Post([FromBody]string value)
+        public void Post(string slug, int? groupId, PostDTO post)
         {
+            if (slug != null)
+            {
+                groupId = _groupService.GetIdBySlug(slug);
+            }
+            if (!ModelState.IsValid || post == null || groupId == null)
+            {
+                Response.StatusCode = 500;
+                Response.WriteAsync("Model state invalid");
+            }
+            else if (!_memberService.IsMember(ProfileId, post.GroupId))
+            {
+                Response.StatusCode = 403;
+                Response.WriteAsync("You are not a member of this group");
+            }
+            post.GroupId = groupId.Value;
+            post.ProfileId = ProfileId;
+            var p = _postService.CreatePost(post);
+            if (p != null)
+            {
+                Response.StatusCode = 500;
+                Response.WriteAsync("Internal server error");
+            }
+            else
+            {
+                Response.StatusCode = 201;
+                Response.WriteAsync("OK");
+            }
+
         }
         
         // PUT: api/Posts/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
+        public void Put(int id, PostDTO post)
         {
+            post.ProfileId = ProfileId;
         }
         
         // DELETE: api/ApiWithActions/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public void Delete(int postId)
         {
+            var post = _postService.GetPostById(postId);
+            if (!_memberService.IsInRole(ProfileId,post.GroupId,Models.MembershipLevel.Admin) && post.ProfileId != ProfileId)
+            {
+                Response.StatusCode = 403;
+                Response.WriteAsync("Not allowed");
+            }
+            else
+            {
+                if (_postService.DeletePost(postId))
+                {
+                    Response.StatusCode = 200;
+                }
+                else
+                {
+                    Response.StatusCode = 500;
+                }
+            }
         }
     }
 }
