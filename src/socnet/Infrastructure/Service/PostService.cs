@@ -31,10 +31,11 @@ namespace socnet.Infrastructure.Service
         }
         public CommentDTO CommentPost(CommentDTO comment)
         {
-            var post = GetPostById(comment.Id);
-            if (post == null || !_memberService.IsMember(comment.ProfileId, post.GroupId)) return null;
+            var post = GetPostById(comment.PostId);
+            if (post == null || !_memberService.IsMember(comment.ProfileId, post.GroupId) || post.GroupId != comment.GroupId) return null;
             Comment newComment = fromDTO(comment);
             newComment.Rating = new List<Rate>();
+            newComment.Id = 0;
             var comm = _commentRepository.AddComment(newComment);
             return toDTO(comm);
         }
@@ -158,6 +159,7 @@ namespace socnet.Infrastructure.Service
 
         private Comment fromDTO(CommentDTO dto)
         {
+            if (dto == null) return null;
             return new Comment
             {
                 ProfileId = dto.ProfileId,
@@ -168,6 +170,7 @@ namespace socnet.Infrastructure.Service
         }
         private CommentDTO toDTO(Comment comm)
         {
+            if (comm == null) return null;
             var dto = new CommentDTO
             {
                 Id = comm.Id,
@@ -185,6 +188,7 @@ namespace socnet.Infrastructure.Service
         }
         private Post fromDTO(PostDTO dto)
         {
+            if (dto == null) return null;
             return new Post
             {
                 ProfileId = dto.ProfileId,
@@ -195,6 +199,7 @@ namespace socnet.Infrastructure.Service
         }
         private PostDTO toDTO(Post post)
         {
+            if (post == null) return null;
             var dto = new PostDTO
             {
                 Id = post.Id,
@@ -208,11 +213,19 @@ namespace socnet.Infrastructure.Service
                 var downs = post.Rating.Count(x => x.Value == RateType.DownVote);
                 dto.Rating = ups - downs;
             }
-            foreach (var comment in post?.Comments)
+            if (post.Comments != null)
             {
-                dto.Comments.Add(toDTO(comment));
+                foreach (var comment in post.Comments)
+                {
+                    dto.Comments.Add(toDTO(comment));
+                }
             }
             return dto;
+        }
+
+        public bool IsInGroup(int postId, int groupId)
+        {
+            return _postRepository.GetPostsForGroupWhere(groupId, x => x.Id == postId).Count() == 1;
         }
     }
 }

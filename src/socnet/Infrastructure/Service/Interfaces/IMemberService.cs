@@ -14,6 +14,7 @@ namespace socnet.Infrastructure.Service.Interfaces
         bool RemoveMember(int membershipId);
         bool RemoveMember(int groupId, int profileId);
         bool SetRole(int membershipId, MembershipLevel newRole);
+        bool SetRole(int profileId, int groupId, MembershipLevel newRole);
         Member GetMembership(int membershipId);
         Member GetMembership(int groupId, int profileId);
 

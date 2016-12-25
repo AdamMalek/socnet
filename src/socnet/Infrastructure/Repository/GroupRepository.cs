@@ -58,6 +58,7 @@ namespace socnet.Infrastructure.Repository
 
         public Group GetBySlug(string slug, params Expression<Func<Group, object>>[] includes)
         {
+            if (slug == null) return null;
             IQueryable<Group> query = _db.Groups;
             foreach (var include in includes)
             {

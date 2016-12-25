@@ -19,6 +19,8 @@ namespace socnet.Infrastructure.Service.Interfaces
         IEnumerable<PostDTO> GetPostsByGroup(int groupId);
         IEnumerable<PostDTO> GetPostsByGroup(string slug);
 
+        bool IsInGroup(int postId, int groupId);
+
         IEnumerable<CommentDTO> GetComments(int postId);
         CommentDTO CommentPost(CommentDTO comment);
         bool RateComment(int commentId, int profileId, RateType vote);

@@ -7,13 +7,15 @@ using Microsoft.AspNetCore.Mvc;
 using socnet.Infrastructure.Service.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using socnet.Models.DTO;
+using socnet.Models;
+using socnet.Infrastructure.Middleware;
 
 namespace socnet.Controllers
 {
     [Produces("application/json")]
     [Route("api/group/{groupId:int}/posts", Name = "PostId")]
     [Route("api/group/{slug}/posts", Name = "PostSlug")]
-    [Authorize]
+    [Authorize(Roles = "GroupMember")]
     public class PostsController : Controller
     {
         private readonly IGroupService _groupService;
@@ -64,7 +66,7 @@ namespace socnet.Controllers
 
         // GET: api/Posts/5
         [HttpGet("{postId}")]
-        public PostDTO Get(string slug,int? groupId, int postId)
+        public PostDTO Get(string slug, int? groupId, int postId)
         {
             if (slug != null)
             {
@@ -97,7 +99,7 @@ namespace socnet.Controllers
                 Response.StatusCode = 500;
                 Response.WriteAsync("Model state invalid");
             }
-            else if (!_memberService.IsMember(ProfileId, post.GroupId))
+            else if (!_memberService.IsMember(ProfileId, groupId.Value))
             {
                 Response.StatusCode = 403;
                 Response.WriteAsync("You are not a member of this group");
@@ -105,7 +107,7 @@ namespace socnet.Controllers
             post.GroupId = groupId.Value;
             post.ProfileId = ProfileId;
             var p = _postService.CreatePost(post);
-            if (p != null)
+            if (p == null)
             {
                 Response.StatusCode = 500;
                 Response.WriteAsync("Internal server error");
@@ -117,20 +119,25 @@ namespace socnet.Controllers
             }
 
         }
-        
+
         // PUT: api/Posts/5
-        [HttpPut("{id}")]
-        public void Put(int id, PostDTO post)
+        [HttpPut("{postId}")]
+        public void Put(int postId, PostDTO post)
         {
             post.ProfileId = ProfileId;
         }
-        
+
         // DELETE: api/ApiWithActions/5
-        [HttpDelete("{id}")]
+        [HttpDelete("{postId}")]
         public void Delete(int postId)
         {
             var post = _postService.GetPostById(postId);
-            if (!_memberService.IsInRole(ProfileId,post.GroupId,Models.MembershipLevel.Admin) && post.ProfileId != ProfileId)
+            if (post == null)
+            {
+                Response.StatusCode = 404;
+                Response.WriteAsync("post not found");
+            }
+            else if (!User.HasClaim(x=> x.Value == "GroupAdmin") && post.ProfileId != ProfileId)
             {
                 Response.StatusCode = 403;
                 Response.WriteAsync("Not allowed");

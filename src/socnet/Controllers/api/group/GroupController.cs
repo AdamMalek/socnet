@@ -40,6 +40,7 @@ namespace socnet.Controllers
         }
         // GET: api/Group/5
         [HttpGet("{id:int}", Name = "GetId")]
+        [Authorize(Roles = "GroupMember")]
         public Group Get(int id)
         {
             var group = _groupService.GetGroupById(id, new string[] { "posts" });
@@ -49,12 +50,6 @@ namespace socnet.Controllers
                 Response.WriteAsync("No group");
                 return null;
             }
-            else if (!_memberService.IsMember(ProfileId, group.GroupId))
-            {
-                Response.StatusCode = 403;
-                Response.WriteAsync("You are not a member");
-                return null;
-            }
             else
             {
                 return group;
@@ -62,6 +57,7 @@ namespace socnet.Controllers
         }
 
         [HttpGet("{slug}", Name = "GetSlug")]
+        [Authorize(Roles = "GroupMember")]
         public Group Get(string slug)
         {
             var group = _groupService.GetGroupBySlug(slug, new string[] { "posts" });
@@ -85,6 +81,7 @@ namespace socnet.Controllers
 
         // POST: api/Group
         [HttpPost]
+        [Authorize]
         public void Post(string name, string slug = "")
         {
             var g = _groupService.CreateGroup(name, ProfileId, slug);
@@ -98,11 +95,11 @@ namespace socnet.Controllers
                 Response.StatusCode = 201;
                 Response.WriteAsync($"Group created with id:{g.GroupId}");
             }
-
         }
 
         // PUT: api/Group/5
         [HttpPut("{id}")]
+        [Authorize(Roles = "GroupAdmin")]
         public void Put(int id, string slug)
         {
             Response.WriteAsync(_groupService.SetSlug(id, slug).ToString());
@@ -110,6 +107,7 @@ namespace socnet.Controllers
 
         // DELETE: api/ApiWithActions/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "GroupAdmin")]
         public void Delete(int id)
         {
         }

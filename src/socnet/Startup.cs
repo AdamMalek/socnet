@@ -150,6 +150,8 @@ namespace socnet
                 AutomaticChallenge = true,
             });
 
+            app.UseMiddleware<MemberMiddleware>();
+
             app.UseStaticFiles();
 
             // Add external authentication middleware below. To configure them please see http://go.microsoft.com/fwlink/?LinkID=532715

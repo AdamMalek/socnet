@@ -88,16 +88,33 @@ namespace socnet.Infrastructure.Service
             return _memberRepository.DeleteMember(membership);
         }
 
-        public bool SetRole(int membershipId, MembershipLevel newRole)
-        {
-            var membership = GetMembership(membershipId);
-            membership.Role = newRole;
-            return _memberRepository.UpdateMember(membership);
-        }
 
         public IEnumerable<Member> GetGroupMembers(int groupId, params Expression<Func<Member, object>>[] includes)
         {
             return _memberRepository.GetMembersWhere(x => x.GroupId == groupId, includes);
+        }
+        public bool SetRole(int membershipId, MembershipLevel newRole)
+        {
+            var membership = GetMembership(membershipId);
+            return SetRole(membership, newRole);
+        }
+
+        public bool SetRole(int profileId, int groupId, MembershipLevel newRole)
+        {
+            var membership = GetMembership(groupId, profileId);
+            return SetRole(membership, newRole);
+        }
+
+        private bool SetRole(Member member, MembershipLevel newRole)
+        {
+            if (member == null) return false;
+            if (newRole == MembershipLevel.User)
+            {
+                var admins = _memberRepository.GetMembersWhere(x => x.Role == MembershipLevel.Admin && x.GroupId == member.GroupId);
+                if (admins.Count() == 1 && admins.First().ProfileId == member.ProfileId) return false;
+            }
+            member.Role = newRole;
+            return _memberRepository.UpdateMember(member);
         }
     }
 }

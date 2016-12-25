@@ -116,5 +116,15 @@ namespace socnet.Infrastructure.Service
         {
             return _inviteRepository.GetInvites(x => x.senderId == profileId).AsEnumerable();
         }
+
+        public bool ProfileExists(int profileId)
+        {
+            return _profileRepository.GetProfileByPredicate(x => x.ProfileId == profileId) != null;
+        }
+
+        public bool ProfileExists(string profileEmail)
+        {
+            return _profileRepository.GetProfileByPredicate(x => x.Email == profileEmail) != null;
+        }
     }
 }

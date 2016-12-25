@@ -13,6 +13,9 @@ namespace socnet.Infrastructure.Service.Interfaces
         Profile CreateProfile(ProfileData profileData);
         Profile UpdateProfile(int id, ProfileData profileData);
 
+        bool ProfileExists(int profileId);
+        bool ProfileExists(string profileEmail);
+
         bool SendFriendRequest(int senderId, int receiverId);
         bool AcceptFriendRequest(string requestId);
         bool RemoveFriend(int profileId, int friendId);

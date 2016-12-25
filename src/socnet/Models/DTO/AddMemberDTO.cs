@@ -8,6 +8,7 @@ namespace socnet.Models.DTO
     public class AddMemberDTO
     {
         public int ProfileId { get; set; }
+        public int GroupId { get; set; }
         public MembershipLevel Role { get; set; }
     }
 }

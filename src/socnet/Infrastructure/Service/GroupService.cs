@@ -181,11 +181,12 @@ namespace socnet.Infrastructure.Service
             return true;
         }
 
-        public bool SetSlug(int groupId, string slug)
+        public bool SetSlug(int groupId, string slug="")
         {
-            slug = sanitizeInput(slug).Replace(" ", "-");
+            slug = sanitizeInput(slug).Replace(" ", "-").Replace(".","").Replace(",", "");
 
             if (string.IsNullOrWhiteSpace(slug)) return false;
+            if (slug[0] >= '0' && slug[0] <= '9') return false;
             var newSlugGroup = GetGroupBySlug(slug);
             if (newSlugGroup != null) return false;
             var group = GetGroupById(groupId);
