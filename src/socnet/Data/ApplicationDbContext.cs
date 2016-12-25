@@ -18,7 +18,8 @@ namespace socnet.Data
         public DbSet<Group> Groups { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<Comment> Comments { get; set; }
-        public DbSet<Rate> Rates { get; set; }
+        public DbSet<CommentRate> CommentRates { get; set; }
+        public DbSet<PostRate> PostRates { get; set; }
         public DbSet<Member> Members { get; set; }
 
 

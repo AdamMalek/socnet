@@ -34,7 +34,7 @@ namespace socnet.Infrastructure.Service
             var post = GetPostById(comment.PostId);
             if (post == null || !_memberService.IsMember(comment.ProfileId, post.GroupId) || post.GroupId != comment.GroupId) return null;
             Comment newComment = fromDTO(comment);
-            newComment.Rating = new List<Rate>();
+            newComment.Rating = new List<CommentRate>();
             newComment.Id = 0;
             var comm = _commentRepository.AddComment(newComment);
             return toDTO(comm);
@@ -124,7 +124,7 @@ namespace socnet.Infrastructure.Service
             }
             else if (rate == null)
             {
-                Rate r = new Rate
+                CommentRate r = new CommentRate
                 {
                     ProfileId = profileId,
                     Value = vote
@@ -147,7 +147,7 @@ namespace socnet.Infrastructure.Service
             }
             else if (rate == null)
             {
-                Rate r = new Rate
+                PostRate r = new PostRate
                 {
                     ProfileId = profileId,
                     Value = vote
@@ -177,6 +177,7 @@ namespace socnet.Infrastructure.Service
                 PostId = comm.PostId,
                 ProfileId = comm.ProfileId,
                 Content = comm.Body,
+                GroupId = comm.Post.GroupId
             };
             if (comm.Rating != null)
             {
@@ -206,6 +207,7 @@ namespace socnet.Infrastructure.Service
                 GroupId = post.GroupId,
                 ProfileId = post.ProfileId,
                 Content = post.Body,
+                Comments = new List<CommentDTO>()
             };
             if (post.Rating != null)
             {

@@ -32,7 +32,7 @@ namespace socnet.Infrastructure.Repository
 
             foreach (var rating in comment.Rating)
             {
-                _db.Rates.Remove(rating);
+                _db.CommentRates.Remove(rating);
             }
             _db.Comments.Remove(comment);
             _db.SaveChanges();

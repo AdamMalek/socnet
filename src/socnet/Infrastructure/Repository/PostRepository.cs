@@ -34,13 +34,13 @@ namespace socnet.Infrastructure.Repository
             {
                 foreach (var rating in comment.Rating)
                 {
-                    _db.Rates.Remove(rating);
+                    _db.CommentRates.Remove(rating);
                 }
                 _db.Comments.Remove(comment);
             }
             foreach (var rating in post.Rating)
             {
-                _db.Rates.Remove(rating);
+                _db.PostRates.Remove(rating);
             }
             _db.Posts.Remove(post);
             _db.SaveChanges();

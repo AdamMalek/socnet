@@ -8,9 +8,10 @@ using socnet.Data;
 namespace socnet.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20161225223154_rating separated")]
+    partial class ratingseparated
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.0.1")
@@ -30,11 +31,15 @@ namespace socnet.Migrations
 
                     b.Property<int>("PostId");
 
+                    b.Property<int?>("PostId1");
+
                     b.Property<int>("ProfileId");
 
                     b.HasKey("Id");
 
                     b.HasIndex("PostId");
+
+                    b.HasIndex("PostId1");
 
                     b.HasIndex("ProfileId");
 
@@ -244,10 +249,14 @@ namespace socnet.Migrations
 
             modelBuilder.Entity("socnet.Models.Comment", b =>
                 {
-                    b.HasOne("socnet.Models.Post", "Post")
-                        .WithMany("Comments")
+                    b.HasOne("socnet.Models.Group", "Post")
+                        .WithMany()
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("socnet.Models.Post")
+                        .WithMany("Comments")
+                        .HasForeignKey("PostId1");
 
                     b.HasOne("socnet.Models.Profile", "Profile")
                         .WithMany()

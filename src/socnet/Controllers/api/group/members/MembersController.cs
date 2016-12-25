@@ -37,7 +37,27 @@ namespace socnet.Controllers
             }
             if (groupId.HasValue)
             {
-                return _memberService.GetGroupMembers(groupId.Value, x => x.Profile);//.Select(x => x.Profile);
+                return _memberService.GetGroupMembers(groupId.Value, x => x.Profile).Select(x => new Member
+                {
+                    GroupId = x.GroupId,
+                    MemberId = x.MemberId,
+                    Role = x.Role,
+                    Profile = new Profile
+                    {
+                        AvatarSrc = x.Profile.AvatarSrc,
+                        Email = x.Profile.Email,
+                        FirstName = x.Profile.FirstName,
+                        LastName = x.Profile.LastName,
+                        University = x.Profile.University,
+                        ProfileId = x.Profile.ProfileId,
+                        Friends = x.Profile.Friends?.Select(f=> new Relation
+                        {
+                            FriendId = f.FriendId,
+                            ProfileId = f.ProfileId,
+                            RelationId = f.RelationId
+                        }).ToList()
+                    }
+                });
             }
             else
             {

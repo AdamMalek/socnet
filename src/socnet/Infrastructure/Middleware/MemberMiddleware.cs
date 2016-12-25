@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using socnet.Infrastructure.Service.Interfaces;
+using socnet.Data;
 
 namespace socnet.Infrastructure.Middleware
 {
@@ -18,13 +19,16 @@ namespace socnet.Infrastructure.Middleware
         private readonly RequestDelegate _next;
         private readonly IUserService _userService;
         private readonly IMemberService _memberService;
+        private readonly ApplicationDbContext _db;
 
         public MemberMiddleware(
             RequestDelegate next,
             IUserService userService,
             IGroupService groupService,
-            IMemberService memberService)
+            IMemberService memberService,
+            ApplicationDbContext db)
         {
+            _db = db;
             _next = next;
             _userService = userService;
             _groupService = groupService;
@@ -57,6 +61,7 @@ namespace socnet.Infrastructure.Middleware
                 {
                     var member = new ClaimsIdentity();
                     member.AddClaim(new Claim(ClaimTypes.Role, "GroupMember"));
+                    var membership = _db.Members.FirstOrDefault(x => x.ProfileId == profileId && x.GroupId == id);
                     if (_memberService.IsInRole(profileId, id, Models.MembershipLevel.Admin))
                     {
                         member.AddClaim(new Claim(ClaimTypes.Role, "GroupAdmin"));
