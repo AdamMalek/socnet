@@ -8,6 +8,8 @@ using NuGet.Protocol.Core.Types;
 using socnet.Infrastructure.Repository.Interfaces;
 using socnet.Infrastructure.Service.Interfaces;
 using socnet.Models;
+using socnet.Models.DTO;
+using socnet.Infrastructure.Extensions;
 
 namespace socnet.Infrastructure.Service
 {
@@ -21,6 +23,8 @@ namespace socnet.Infrastructure.Service
             _profileRepository = repository;
             _inviteRepository = inviteRepository;
         }
+
+
         public Profile GetProfileById(int profileId, params Expression<Func<Profile, object>>[] includes)
         {
             return _profileRepository.GetProfileByPredicate(x => x.ProfileId == profileId, includes);
@@ -33,14 +37,7 @@ namespace socnet.Infrastructure.Service
 
         public Profile CreateProfile(ProfileData profileData)
         {
-            Profile newProfile = new Profile
-            {
-                AvatarSrc = profileData.AvatarSrc,
-                Email = profileData.Email,
-                FirstName = profileData.FirstName,
-                LastName = profileData.LastName,
-                University = profileData.University
-            };
+            Profile newProfile = new Profile(profileData);
             _profileRepository.CreateProfile(newProfile);
             return newProfile;
         }

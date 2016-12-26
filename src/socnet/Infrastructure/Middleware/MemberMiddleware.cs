@@ -10,6 +10,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using socnet.Infrastructure.Service.Interfaces;
 using socnet.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace socnet.Infrastructure.Middleware
 {

@@ -8,8 +8,8 @@ using socnet.Data;
 namespace socnet.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20161225224157_commentfix")]
-    partial class commentfix
+    [Migration("20161225234248_noxd")]
+    partial class noxd
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

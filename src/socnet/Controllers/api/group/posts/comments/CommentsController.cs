@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using socnet.Infrastructure.Service.Interfaces;
 using socnet.Models.DTO;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace socnet.Controllers
 {
@@ -96,9 +97,37 @@ namespace socnet.Controllers
         }
 
         // PUT: api/Comments/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
+        [HttpPut("{id:int}")]
+        public void Put(string slug, int? groupId, int postId, CommentDTO comment)
         {
+            SetGroupId(slug, ref groupId);
+            if (string.IsNullOrWhiteSpace(comment.Content) || !_postService.IsInGroup(postId, groupId.Value))
+            {
+                Response.StatusCode = 404;
+                return;
+            }
+            if (ProfileId != _postService.GetCommentAuthorId(comment.Id) && !IsGroupAdmin(groupId.Value))
+            {
+                Response.StatusCode = 403;
+                return;
+            }
+            else
+            {
+                comment.GroupId = groupId.Value;
+                comment.ProfileId = ProfileId;
+                comment.PostId = postId;
+                var res = _postService.EditComment(comment);
+                if (res != null)
+                {
+                    Response.StatusCode = 200;
+                    return;
+                }
+                else
+                {
+                    Response.StatusCode = 500;
+                    return;
+                }
+            }
         }
 
         // DELETE: api/ApiWithActions/5
@@ -118,6 +147,10 @@ namespace socnet.Controllers
                     groupId = res.Value;
                 }
             }
+        }
+        private bool IsGroupAdmin(int groupId)
+        {
+            return _memberService.IsInRole(ProfileId, groupId, Models.MembershipLevel.Admin);
         }
     }
 }

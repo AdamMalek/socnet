@@ -8,8 +8,8 @@ using socnet.Data;
 namespace socnet.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20161222004955_comments")]
-    partial class comments
+    [Migration("20161225232923_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -17,7 +17,7 @@ namespace socnet.Migrations
                 .HasAnnotation("ProductVersion", "1.0.1")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("socnet.Models.Content", b =>
+            modelBuilder.Entity("socnet.Models.Comment", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
@@ -27,18 +27,39 @@ namespace socnet.Migrations
 
                     b.Property<DateTime>("DateCreated");
 
-                    b.Property<string>("Discriminator")
-                        .IsRequired();
+                    b.Property<DateTime>("LastModified");
+
+                    b.Property<int>("PostId");
 
                     b.Property<int>("ProfileId");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("PostId");
+
                     b.HasIndex("ProfileId");
 
-                    b.ToTable("Content");
+                    b.ToTable("Comments");
+                });
 
-                    b.HasDiscriminator<string>("Discriminator").HasValue("Content");
+            modelBuilder.Entity("socnet.Models.CommentRate", b =>
+                {
+                    b.Property<int>("RateId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("CommentId");
+
+                    b.Property<int>("ProfileId");
+
+                    b.Property<int>("Value");
+
+                    b.HasKey("RateId");
+
+                    b.HasIndex("CommentId");
+
+                    b.HasIndex("ProfileId");
+
+                    b.ToTable("CommentRates");
                 });
 
             modelBuilder.Entity("socnet.Models.Group", b =>
@@ -81,6 +102,9 @@ namespace socnet.Migrations
 
                     b.Property<int>("Role");
 
+                    b.Property<string>("xd")
+                        .IsRequired();
+
                     b.HasKey("MemberId");
 
                     b.HasIndex("GroupId");
@@ -88,6 +112,51 @@ namespace socnet.Migrations
                     b.HasIndex("ProfileId");
 
                     b.ToTable("Members");
+                });
+
+            modelBuilder.Entity("socnet.Models.Post", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Body")
+                        .IsRequired();
+
+                    b.Property<DateTime>("DateCreated");
+
+                    b.Property<int>("GroupId");
+
+                    b.Property<DateTime>("LastModified");
+
+                    b.Property<int>("ProfileId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GroupId");
+
+                    b.HasIndex("ProfileId");
+
+                    b.ToTable("Posts");
+                });
+
+            modelBuilder.Entity("socnet.Models.PostRate", b =>
+                {
+                    b.Property<int>("RateId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("PostId");
+
+                    b.Property<int>("ProfileId");
+
+                    b.Property<int>("Value");
+
+                    b.HasKey("RateId");
+
+                    b.HasIndex("PostId");
+
+                    b.HasIndex("ProfileId");
+
+                    b.ToTable("PostRates");
                 });
 
             modelBuilder.Entity("socnet.Models.Profile", b =>
@@ -115,26 +184,6 @@ namespace socnet.Migrations
                     b.HasKey("ProfileId");
 
                     b.ToTable("Profiles");
-                });
-
-            modelBuilder.Entity("socnet.Models.Rate", b =>
-                {
-                    b.Property<int>("RateId")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<int>("ContentId");
-
-                    b.Property<int>("ProfileId");
-
-                    b.Property<int>("Value");
-
-                    b.HasKey("RateId");
-
-                    b.HasIndex("ContentId");
-
-                    b.HasIndex("ProfileId");
-
-                    b.ToTable("Rates");
                 });
 
             modelBuilder.Entity("socnet.Models.Relation", b =>
@@ -199,36 +248,24 @@ namespace socnet.Migrations
 
             modelBuilder.Entity("socnet.Models.Comment", b =>
                 {
-                    b.HasBaseType("socnet.Models.Content");
+                    b.HasOne("socnet.Models.Post", "Post")
+                        .WithMany("Comments")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
-                    b.Property<int>("PostId");
-
-                    b.Property<int?>("PostId1");
-
-                    b.HasIndex("PostId");
-
-                    b.HasIndex("PostId1");
-
-                    b.ToTable("Comment");
-
-                    b.HasDiscriminator().HasValue("Comment");
+                    b.HasOne("socnet.Models.Profile", "Profile")
+                        .WithMany()
+                        .HasForeignKey("ProfileId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("socnet.Models.Post", b =>
+            modelBuilder.Entity("socnet.Models.CommentRate", b =>
                 {
-                    b.HasBaseType("socnet.Models.Content");
+                    b.HasOne("socnet.Models.Comment", "Comment")
+                        .WithMany("Rating")
+                        .HasForeignKey("CommentId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
-                    b.Property<int>("GroupId");
-
-                    b.HasIndex("GroupId");
-
-                    b.ToTable("Post");
-
-                    b.HasDiscriminator().HasValue("Post");
-                });
-
-            modelBuilder.Entity("socnet.Models.Content", b =>
-                {
                     b.HasOne("socnet.Models.Profile", "Profile")
                         .WithMany()
                         .HasForeignKey("ProfileId")
@@ -248,11 +285,24 @@ namespace socnet.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("socnet.Models.Rate", b =>
+            modelBuilder.Entity("socnet.Models.Post", b =>
                 {
-                    b.HasOne("socnet.Models.Content", "Content")
+                    b.HasOne("socnet.Models.Group", "Group")
+                        .WithMany("Posts")
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("socnet.Models.Profile", "Profile")
+                        .WithMany()
+                        .HasForeignKey("ProfileId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("socnet.Models.PostRate", b =>
+                {
+                    b.HasOne("socnet.Models.Post", "Post")
                         .WithMany("Rating")
-                        .HasForeignKey("ContentId")
+                        .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("socnet.Models.Profile", "Profile")
@@ -281,26 +331,6 @@ namespace socnet.Migrations
                     b.HasOne("socnet.Models.Profile", "Profile")
                         .WithOne("User")
                         .HasForeignKey("socnet.Models.User", "ProfileId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("socnet.Models.Comment", b =>
-                {
-                    b.HasOne("socnet.Models.Group", "Post")
-                        .WithMany()
-                        .HasForeignKey("PostId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("socnet.Models.Post")
-                        .WithMany("Comments")
-                        .HasForeignKey("PostId1");
-                });
-
-            modelBuilder.Entity("socnet.Models.Post", b =>
-                {
-                    b.HasOne("socnet.Models.Group", "Group")
-                        .WithMany("Posts")
-                        .HasForeignKey("GroupId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
         }

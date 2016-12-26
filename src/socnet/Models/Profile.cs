@@ -28,5 +28,19 @@ namespace socnet.Models
         public string AvatarSrc { get; set; }
         public List<Relation> Friends { get; set; }
         public User User { get; set; }
+
+        public Profile(ProfileData data)
+        {
+            AvatarSrc = data.AvatarSrc;
+            Email = data.Email;
+            FirstName = data.FirstName;
+            LastName = data.LastName;
+            University = data.University;
+        }
+
+        public Profile()
+        {
+
+        }
     }
 }

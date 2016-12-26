@@ -64,21 +64,29 @@ namespace socnet.Infrastructure.Service
             return _postRepository.DeletePost(postId);
         }
 
-        public CommentDTO EditComment(int commentId, string newMessage)
+        public CommentDTO EditComment(CommentDTO comment)
         {
-            var comm = _commentRepository.GetCommentById(commentId);
-            if (comm == null) return null;
-            comm.Body = newMessage;
+            var comm = _commentRepository.GetCommentById(comment.Id,x=> x.Post);
+            if (comm == null || !isValid(comment.Content) ||
+                comm.Post.Id != comment.PostId || comm.Post.GroupId != comment.GroupId) return null;
+            comm.Body = comment.Content;
             comm.LastModified = DateTime.UtcNow;
             _commentRepository.UpdateComment(comm);
             return toDTO(comm);
         }
 
-        public PostDTO EditPost(int postId, string newMessage)
+        private bool isValid(string content)
         {
-            var post = _postRepository.GetPostById(postId);
-            if (post == null) return null;
-            post.Body = newMessage;
+            if (string.IsNullOrWhiteSpace(content)) return false;
+            // reguly
+            return true;
+        }
+
+        public PostDTO EditPost(PostDTO newPost)
+        {
+            var post = _postRepository.GetPostById(newPost.Id);
+            if (post == null || !isValid(newPost.Content)) return null;
+            post.Body = newPost.Content;
             post.LastModified = DateTime.UtcNow;
             post = _postRepository.UpdatePost(post);
             return toDTO(post);
@@ -86,7 +94,7 @@ namespace socnet.Infrastructure.Service
 
         public IEnumerable<CommentDTO> GetComments(int postId)
         {
-            return _commentRepository.GetCommentsByQuery(x => x.PostId == postId).Select(x => toDTO(x));
+            return _commentRepository.GetCommentsByQuery(x => x.PostId == postId,x=>x.Post).Select(x => toDTO(x));
         }
 
         public PostDTO GetPostById(int postId)
@@ -228,6 +236,16 @@ namespace socnet.Infrastructure.Service
         public bool IsInGroup(int postId, int groupId)
         {
             return _postRepository.GetPostsForGroupWhere(groupId, x => x.Id == postId).Count() == 1;
+        }
+
+        public int GetPostAuthorId(int postId)
+        {
+            return _postRepository.GetPostById(postId).ProfileId;
+        }
+
+        public int GetCommentAuthorId(int postId)
+        {
+            return _commentRepository.GetCommentById(postId).ProfileId;
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using Microsoft.AspNetCore.Routing;
 using socnet.Models;
+using socnet.Models.DTO;
 
 namespace socnet.Infrastructure.Service.Interfaces
 {

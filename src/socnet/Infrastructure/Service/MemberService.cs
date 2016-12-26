@@ -79,11 +79,11 @@ namespace socnet.Infrastructure.Service
 
         public bool RemoveMember(int groupId, int profileId)
         {
-            var membership = GetMembership(groupId,profileId);
+            var membership = GetMembership(groupId, profileId);
             if (membership == null) return false;
 
             if (membership.Role == MembershipLevel.Admin
-                && _memberRepository.GetMembersWhere(x=> x.GroupId == groupId && x.Role ==  MembershipLevel.Admin).Count() == 1) return false;
+                && _memberRepository.GetMembersWhere(x => x.GroupId == groupId && x.Role == MembershipLevel.Admin).Count() == 1) return false;
 
             return _memberRepository.DeleteMember(membership);
         }
