@@ -32,6 +32,20 @@ namespace socnet.Infrastructure.Repository
             }
         }
 
+        public Message AddMessage(Message msg)
+        {
+            try
+            {
+                _db.Set<Message>().Add(msg);
+                _db.SaveChanges();
+                return msg;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         public IEnumerable<Conversation> GetByQuery(Expression<Func<Conversation, bool>> predicate,bool includeMsg=false)
         {
             IQueryable<Conversation> query = _db.Conversations;
@@ -52,10 +66,14 @@ namespace socnet.Infrastructure.Repository
             return query.Where(x => (x.Member1Id == profile1Id && x.Member2Id == profile2Id) || (x.Member1Id == profile2Id && x.Member2Id == profile1Id)).SingleOrDefault();
         }
 
-        public IEnumerable<Conversation> GetProfileConversations(int profileId)
+        public IEnumerable<Conversation> GetProfileConversations(int profileId,bool messages)
         {
-            return _db.Conversations.Where(x => x.Member1Id == profileId || x.Member2Id == profileId).AsEnumerable();
-
+            IQueryable<Conversation> query = _db.Conversations;
+            if (messages)
+            {
+                query = query.Include(x => x.Messages);
+            }
+            return query.Where(x => x.Member1Id == profileId || x.Member2Id == profileId).AsEnumerable();
         }
 
         public bool RemoveConversation(int id)

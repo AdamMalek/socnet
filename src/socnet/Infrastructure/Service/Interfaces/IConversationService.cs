@@ -11,9 +11,9 @@ namespace socnet.Infrastructure.Service.Interfaces
         ConversationDTO GetConversation(int profileId, int friendId,bool includeMessages = false);
         int GetConversationId(int profileId, int friendId);
 
-        IEnumerable<ConversationDTO> GetInbox(int profileId);
+        IEnumerable<ConversationDTO> GetInbox(int profileId,bool include=false);
 
-        bool SendMessage(int convId, MessageDTO msg);
+        bool SendMessage(int friendId, MessageDTO msg);
 
         bool DeleteConversation(int profileId, int friendId);
     }

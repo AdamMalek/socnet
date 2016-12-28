@@ -11,11 +11,12 @@ namespace socnet.Infrastructure.Repository.Interfaces
     {
         Conversation GetConversationBetween(int profile1Id, int profile2Id,bool includeMessages=false);
 
-        IEnumerable<Conversation> GetProfileConversations(int profileId);
+        IEnumerable<Conversation> GetProfileConversations(int profileId,bool messages);
 
         IEnumerable<Conversation> GetByQuery(Expression<Func<Conversation, bool>> predicate, bool includeMsg=false);
 
         Conversation AddConversaion(Conversation conv);
+        Message AddMessage(Message msg);
 
         bool RemoveConversation(int id);
 

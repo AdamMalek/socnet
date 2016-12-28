@@ -21,7 +21,7 @@ namespace socnet.Infrastructure.Extensions
 
             if (conv.Messages != null)
             {
-                foreach (var msg in conv.Messages)
+                foreach (var msg in conv.Messages.OrderBy(x=> x.Date))
                 {
                     dto.Messages.Add(msg.ToDto(profileId));
                 }
