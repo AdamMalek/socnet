@@ -14,8 +14,9 @@ namespace socnet.Infrastructure.Extensions
             if (profile == null) return null;
             return new ProfileDTO
             {
-                AvatarUrl = profile.AvatarSrc,
-                FullName = $"{profile.FirstName} {profile.LastName}",
+                AvatarSrc = profile.AvatarSrc,
+                FirstName = profile.FirstName,
+                LastName = profile.LastName,
                 Email = profile.Email,
                 ProfileId = profile.ProfileId,
                 University = profile.University

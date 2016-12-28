@@ -21,6 +21,7 @@ using socnet.Infrastructure.Service;
 using socnet.Infrastructure.Service.Interfaces;
 using socnet.Models;
 using socnet.Services;
+using socnet.Infrastructure.Extensions;
 
 namespace socnet
 {
@@ -88,6 +89,9 @@ namespace socnet
             services.AddTransient<IMemberRepository, MemberRepository>();
             services.AddTransient<IMemberService, MemberService>();
 
+            services.AddTransient<IConversationRepository, ConversationRepository>();
+            services.AddTransient<IConversationService, ConversationService>();
+
             services.AddTransient<ICommentRepository, CommentRepository>();
             services.AddTransient<IPostRepository, PostRepository>();
             services.AddTransient<IPostService, PostService>();
@@ -150,7 +154,9 @@ namespace socnet
                 AutomaticChallenge = true,
             });
 
-            app.UseMiddleware<MemberMiddleware>();
+            app.UseGroupMemberMiddleware();
+            app.UseGroupAdminMiddleware();
+            app.UseCheckProfileOwnerMiddleware();
 
             app.UseStaticFiles();
 

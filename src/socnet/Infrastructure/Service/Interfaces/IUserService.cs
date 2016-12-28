@@ -13,7 +13,7 @@ namespace socnet.Infrastructure.Service.Interfaces
         User GetUserById(int id,params Expression<Func<User, object>>[] includeProperties);
         User GetUserByUserName(string username, params Expression<Func<User, object>>[] includeProperties);
         User GetUserByEmail(string email, params Expression<Func<User, object>>[] includeProperties);
-        User RegisterUser(string username, string password, ProfileData profile);
+        User RegisterUser(string username, string password, ProfileDTO profile);
         User LoginUser(string username, string password);
         bool AddUserRole(int userId, string roleName);
         bool AddUserRole(string userName, string roleName);

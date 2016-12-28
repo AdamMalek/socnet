@@ -226,7 +226,7 @@ namespace socnet.Infrastructure.Service
             return query.Skip(skip).Take(count).AsEnumerable();
         }
 
-        private string sanitizeInput(string input) => input.Trim().Replace("\r", "").Replace("\n", "").Replace("\t", "");
+        private string sanitizeInput(string input) => input == null ? null : input.Trim().Replace("\r", "").Replace("\n", "").Replace("\t", "");
 
         public int? GetIdBySlug(string slug)
         {

@@ -53,7 +53,7 @@ namespace socnet.Infrastructure.Service
             return GetUsers(x => x.Profile.Email.ToLower().Equals(email.ToLower()),includeProperties).FirstOrDefault();
         }
 
-        public User RegisterUser(string username, string password, ProfileData profileData)
+        public User RegisterUser(string username, string password, ProfileDTO profileData)
         {
             if (username.Trim().Length == 0 || password.Length == 0) return null;
             if (GetUserByEmail(profileData.Email) != null) return null;

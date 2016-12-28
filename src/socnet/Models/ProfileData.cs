@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace socnet.Models
 {
-    public class ProfileData
+    public class ProfileDTO
     {
+        public int ProfileId { get; set; }
         [Required]
         [MaxLength(20)]
         public string FirstName { get; set; }

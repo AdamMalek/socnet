@@ -29,7 +29,7 @@ namespace socnet.Models
         public List<Relation> Friends { get; set; }
         public User User { get; set; }
 
-        public Profile(ProfileData data)
+        public Profile(ProfileDTO data)
         {
             AvatarSrc = data.AvatarSrc;
             Email = data.Email;

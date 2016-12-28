@@ -10,7 +10,7 @@ using socnet.Models;
 
 namespace socnet.Infrastructure.Repository
 {
-    public class ProfileRepository: IProfileRepository
+    public class ProfileRepository : IProfileRepository
     {
         private readonly ApplicationDbContext _db;
 
@@ -18,15 +18,12 @@ namespace socnet.Infrastructure.Repository
         {
             _db = db;
         }
-        public Profile GetProfileByPredicate(Expression<Func<Profile, bool>> predicate, Expression<Func<Profile, object>>[] includes = null)
+        public Profile GetProfileByPredicate(Expression<Func<Profile, bool>> predicate, params Expression<Func<Profile, object>>[] includes)
         {
             IQueryable<Profile> query = _db.Profiles;
-            if (includes != null)
+            foreach (var include in includes)
             {
-                foreach (var include in includes)
-                {
-                    query = query.Include(include);
-                }
+                query = query.Include(include);
             }
             return query.FirstOrDefault(predicate);
         }
@@ -58,10 +55,20 @@ namespace socnet.Infrastructure.Repository
         {
             var sender = _db.Profiles.Include(x => x.Friends).FirstOrDefault(x => x.ProfileId == senderId);
             var receiver = _db.Profiles.Include(x => x.Friends).FirstOrDefault(x => x.ProfileId == receiverId);
-            sender.Friends.Remove(sender.Friends.First(x=> x.FriendId == receiverId));
-            receiver.Friends.Remove(receiver.Friends.First(x=> x.FriendId == senderId));
+            sender.Friends.Remove(sender.Friends.First(x => x.FriendId == receiverId));
+            receiver.Friends.Remove(receiver.Friends.First(x => x.FriendId == senderId));
             _db.SaveChanges();
             return true;
+        }
+
+        public IEnumerable<Profile> GetProfilesByPredicate(Expression<Func<Profile, bool>> predicate, params Expression<Func<Profile, object>>[] includes)
+        {
+            IQueryable<Profile> query = _db.Profiles;
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+            return query.Where(predicate).AsEnumerable();
         }
     }
 }

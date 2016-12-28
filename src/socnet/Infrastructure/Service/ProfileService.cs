@@ -35,20 +35,20 @@ namespace socnet.Infrastructure.Service
             return _profileRepository.GetProfileByPredicate(x => x.Email == email, includes);
         }
 
-        public Profile CreateProfile(ProfileData profileData)
+        public Profile CreateProfile(ProfileDTO profileData)
         {
             Profile newProfile = new Profile(profileData);
             _profileRepository.CreateProfile(newProfile);
             return newProfile;
         }
 
-        public Profile UpdateProfile(int id, ProfileData profileData)
+        public Profile UpdateProfile(int id, ProfileDTO profileData)
         {
             var profile = GetProfileById(id);
-            profile.AvatarSrc = profileData.AvatarSrc;
-            profile.FirstName = profileData.FirstName;
-            profile.LastName = profileData.LastName;
-            profile.University = profileData.University;
+            profile.AvatarSrc = profileData.AvatarSrc ?? profile.AvatarSrc;
+            profile.FirstName = profileData.FirstName ?? profile.FirstName;
+            profile.LastName = profileData.LastName ?? profile.LastName;
+            profile.University = profileData.University ?? profile.University;
             _profileRepository.UpdateProfile(profile);
             return profile;
         }
@@ -122,6 +122,24 @@ namespace socnet.Infrastructure.Service
         public bool ProfileExists(string profileEmail)
         {
             return _profileRepository.GetProfileByPredicate(x => x.Email == profileEmail) != null;
+        }
+
+        public IEnumerable<Profile> GetFriends(int profileId, int count = 0, int skip = 0)
+        {
+            var ids = GetProfileById(profileId, x => x.Friends, x => x.Friends).Friends.Select(x=> x.FriendId);
+            return _profileRepository.GetProfilesByPredicate(x => ids.Contains(x.ProfileId)).AsEnumerable();
+        }
+
+        public bool AreFriends(int profileId, int friendId)
+        {
+            var friendIds = _profileRepository.GetProfileByPredicate(x => x.ProfileId == profileId,x=> x.Friends)
+                .Friends.Select(x=> x.FriendId);
+            return friendIds.Contains(friendId);
+        }
+
+        public bool InviteExistsForUser(int profileId, string inviteId)
+        {
+            return _inviteRepository.GetInvites(x => x.receiverId == profileId && x.InviteId == inviteId).FirstOrDefault() != null;
         }
     }
 }

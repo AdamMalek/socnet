@@ -116,7 +116,7 @@ namespace socnet.Controllers
                     ModelState.AddModelError("Username", "Username is taken");
                     return View(vm);
                 }
-                ProfileData p = new ProfileData
+                ProfileDTO p = new ProfileDTO
                 {
                     Email = vm.Email,
                     FirstName = vm.FirstName,

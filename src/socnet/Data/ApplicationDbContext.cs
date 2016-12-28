@@ -14,6 +14,8 @@ namespace socnet.Data
         public DbSet<Relation> Relationships { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<Invite> Invites { get; set; }
+        public DbSet<Conversation> Conversations { get; set; }
+
 
         public DbSet<Group> Groups { get; set; }
         public DbSet<Post> Posts { get; set; }
