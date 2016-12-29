@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
@@ -99,6 +100,8 @@ namespace socnet
 
             services.AddTransient<IInviteRepository, InviteRepository>();
 
+            services.AddSignalR(options => options.Hubs.EnableDetailedErrors = true);
+
             services.Configure<ConfigClass>(Configuration);
         }
 
@@ -161,6 +164,17 @@ namespace socnet
             app.UseMemberMiddleware();
             app.UseCheckProfileOwnerMiddleware();
 
+            app.Use(async (context, next) =>
+            {
+                await next();
+
+                if (context.Response.StatusCode == 404
+                    && !Path.HasExtension(context.Request.Path.Value))
+                {
+                    context.Request.Path = "/index.html";
+                    await next();
+                }
+            });
             app.UseStaticFiles();
 
             // Add external authentication middleware below. To configure them please see http://go.microsoft.com/fwlink/?LinkID=532715
@@ -171,6 +185,8 @@ namespace socnet
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            app.UseSignalR();
         }
     }
 }
