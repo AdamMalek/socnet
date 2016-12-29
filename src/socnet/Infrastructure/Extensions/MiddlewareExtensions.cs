@@ -9,14 +9,9 @@ namespace socnet.Infrastructure.Extensions
 {
     public static class MiddlewareExtensions
     {
-        public static void UseGroupMemberMiddleware(this IApplicationBuilder app)
+        public static void UseMemberMiddleware(this IApplicationBuilder app)
         {
             app.UseMiddleware<MemberMiddleware>();
-        }
-
-        public static void UseGroupAdminMiddleware(this IApplicationBuilder app)
-        {
-            app.UseMiddleware<GroupAdminMiddleware>();
         }
 
         public static void UseCheckProfileOwnerMiddleware(this IApplicationBuilder app)

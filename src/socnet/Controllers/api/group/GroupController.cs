@@ -56,6 +56,12 @@ namespace socnet.Controllers
             }
         }
 
+        [HttpGet("{groupId:int}/roles")]
+        public IEnumerable<string> GetRoles()
+        {
+            return User.Claims.Where(x => x.Type == ClaimTypes.Role).Select(x => x.Value);
+        }
+
         [HttpGet("{slug}", Name = "GetSlug")]
         [Authorize(Roles = "GroupMember")]
         public Group Get(string slug)
@@ -65,12 +71,6 @@ namespace socnet.Controllers
             {
                 Response.StatusCode = 404;
                 Response.WriteAsync("No group");
-                return null;
-            }
-            else if (!_memberService.IsMember(ProfileId, group.GroupId))
-            {
-                Response.StatusCode = 403;
-                Response.WriteAsync("You are not a member");
                 return null;
             }
             else

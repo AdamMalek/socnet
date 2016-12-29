@@ -9,13 +9,14 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using socnet.Infrastructure.Service.Interfaces;
+using Microsoft.IdentityModel.Tokens;
 using socnet.Data;
 using socnet.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace socnet.Infrastructure.Middleware
 {
-    public class TokenProviderMiddleware
+    public class RefreshTokenMiddleware
     {
         private readonly RequestDelegate _next;
         private readonly TokenProviderOptions _options;
@@ -23,22 +24,25 @@ namespace socnet.Infrastructure.Middleware
         private readonly JsonSerializerSettings _serializerSettings;
         private readonly IUserService _userService;
         private readonly IMemberService _memberService;
+        private readonly TokenValidationParameters _param;
         private readonly ApplicationDbContext _db;
 
-        public TokenProviderMiddleware(
+        public RefreshTokenMiddleware(
             RequestDelegate next,
             IOptions<TokenProviderOptions> options,
+            TokenValidationParameters param,
             ILoggerFactory loggerFactory,
             IUserService userService,
             IMemberService memberService,
             ApplicationDbContext db)
         {
-            _db = db;
+            _param = param;
             _next = next;
             _logger = loggerFactory.CreateLogger<TokenProviderMiddleware>();
             _userService = userService;
             _memberService = memberService;
             _options = options.Value;
+            _db = db;
             ThrowIfInvalidOptions(_options);
 
             _serializerSettings = new JsonSerializerSettings
@@ -50,7 +54,7 @@ namespace socnet.Infrastructure.Middleware
         public Task Invoke(HttpContext context)
         {
             // If the request path doesn't match, skip
-            if (!context.Request.Path.Equals(_options.AccessTokenPath, StringComparison.Ordinal))
+            if (!context.Request.Path.Equals(_options.RefreshTokenPath, StringComparison.Ordinal))
             {
                 return _next(context);
             }
@@ -62,18 +66,45 @@ namespace socnet.Infrastructure.Middleware
                 context.Response.StatusCode = 400;
                 return context.Response.WriteAsync("Bad request.");
             }
-
-            _logger.LogInformation("Handling request: " + context.Request.Path);
-            var ret = GenerateToken(context);
-            return ret;
+            if (!context.Request.Headers.Any(x => x.Key == "Authorization"))
+            {
+                context.Response.StatusCode = 401;
+                return context.Response.WriteAsync("No refresh token given.");
+            }
+            string token = context.Request.Headers["Authorization"];
+            var split = token.Split(' ');
+            if (!split[0].Equals("Bearer") || split.Length != 2)
+            {
+                context.Response.StatusCode = 401;
+                return context.Response.WriteAsync("No refresh token given.");
+            }
+            token = split[1];
+            JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
+            SecurityToken tok;
+            try
+            {
+                ClaimsPrincipal claimsprincipal = handler.ValidateToken(token, _param, out tok);
+                var userIdstr = claimsprincipal.Claims.FirstOrDefault(x => x.Type == "userId").Value;
+                var token_type = claimsprincipal.Claims.FirstOrDefault(x => x.Type == "token_type")?.Value;
+                if (token_type == null || !token_type.Equals("refresh_token"))
+                {
+                    context.Response.StatusCode = 401;
+                    return context.Response.WriteAsync("Invalid refresh token.");
+                }
+                var userId = Convert.ToInt32(userIdstr);
+                var ret = GenerateToken(context, userId);
+                return ret;
+            }
+            catch
+            {
+                context.Response.StatusCode = 401;
+                return context.Response.WriteAsync("Invalid refresh token.");
+            }
         }
 
-        private async Task GenerateToken(HttpContext context)
+        private async Task GenerateToken(HttpContext context, int userId)
         {
-            var username = context.Request.Form["username"];
-            var password = context.Request.Form["password"];
-
-            var identity = await GetIdentity(username, password);
+            var identity = await GetIdentity(userId);
             if (identity == null)
             {
                 context.Response.StatusCode = 400;
@@ -87,22 +118,11 @@ namespace socnet.Infrastructure.Middleware
             // You can add other claims here, if you want:
             var claims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Sub, username),
                 new Claim(JwtRegisteredClaimNames.Jti, await _options.NonceGenerator()),
                 new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(now).ToString(), ClaimValueTypes.Integer64),
             };
-
 
             claims.AddRange(identity.Claims);
-
-            var refreshClaims = new List<Claim>
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, username),
-                new Claim(JwtRegisteredClaimNames.Jti, await _options.NonceGenerator()),
-                new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(now).ToString(), ClaimValueTypes.Integer64),
-                claims.First(x=> x.Type == "userId"),
-                new Claim("token_type","refresh_token")
-            };
 
             // Create the JWT and write it to a string
             var jwt = new JwtSecurityToken(
@@ -114,19 +134,9 @@ namespace socnet.Infrastructure.Middleware
                 signingCredentials: _options.SigningCredentials);
             var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 
-            var refreshJwt = new JwtSecurityToken(
-                issuer: _options.Issuer,
-                audience: _options.Audience,
-                claims: refreshClaims,
-                notBefore: now,
-                expires: now.Add(_options.RefreshTokenExpiration),
-                signingCredentials: _options.SigningCredentials);
-            var encodedRefreshJwt = new JwtSecurityTokenHandler().WriteToken(refreshJwt);
-
             var response = new
             {
                 access_token = encodedJwt,
-                refresh_token = encodedRefreshJwt,
                 expires_in = (int)_options.AccessTokenExpiration.TotalSeconds
             };
 
@@ -137,9 +147,9 @@ namespace socnet.Infrastructure.Middleware
 
         private static void ThrowIfInvalidOptions(TokenProviderOptions options)
         {
-            if (string.IsNullOrEmpty(options.AccessTokenPath))
+            if (string.IsNullOrEmpty(options.RefreshTokenPath))
             {
-                throw new ArgumentNullException(nameof(TokenProviderOptions.AccessTokenPath));
+                throw new ArgumentNullException(nameof(TokenProviderOptions.RefreshTokenPath));
             }
 
             if (string.IsNullOrEmpty(options.Issuer))
@@ -180,18 +190,19 @@ namespace socnet.Infrastructure.Middleware
         /// <returns>Seconds since Unix epoch.</returns>
         public static long ToUnixEpochDate(DateTime date) => new DateTimeOffset(date).ToUniversalTime().ToUnixTimeSeconds();
 
-        private Task<ClaimsIdentity> GetIdentity(string username, string password)
+        private Task<ClaimsIdentity> GetIdentity(int userId)
         {
-            var user = _userService.LoginUser(username, password);
+            var user = _userService.GetUserById(userId);
             if (user == null) return null;
 
             user = _userService.GetUserById(user.UserId, x => x.Profile);
             List<Claim> claims = new List<Claim>
             {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Username),
                 new Claim("userId", user.UserId.ToString(), ClaimValueTypes.Integer32),
                 new Claim("profileId", user.Profile.ProfileId.ToString(), ClaimValueTypes.Integer32),
             };
-            var groups = _db.Set<Member>().AsNoTracking().Where(x => x.ProfileId == user.UserId);
+            var groups = _db.Set<Member>().AsNoTracking().Where(x=> x.ProfileId == user.UserId);
             foreach (var group in groups)
             {
                 claims.Add(new Claim("member", group.GroupId.ToString(), ClaimValueTypes.Integer));
@@ -201,8 +212,6 @@ namespace socnet.Infrastructure.Middleware
                 }
             }
             claims.AddRange(_userService.GetRoles(user.UserId).Select(role => new Claim(ClaimTypes.Role, role)));
-            //var roles = string.Join(",", _userService.GetRoles(user.UserId));
-            //claims.Add(new Claim(ClaimTypes.Role, roles));
 
             var ret = new ClaimsIdentity(claims);
             return Task.FromResult(ret);

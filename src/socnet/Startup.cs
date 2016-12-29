@@ -22,6 +22,7 @@ using socnet.Infrastructure.Service.Interfaces;
 using socnet.Models;
 using socnet.Services;
 using socnet.Infrastructure.Extensions;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace socnet
 {
@@ -65,7 +66,7 @@ namespace socnet
             services.AddApplicationInsightsTelemetry(Configuration);
 
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             //services.AddIdentity<ApplicationUser, IdentityRole>()
             //    .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -128,12 +129,12 @@ namespace socnet
             {
                 Audience = "users",
                 Issuer = "me",
-                Expiration = TimeSpan.FromDays(3),
-                Path = "/login",
+                AccessTokenExpiration = TimeSpan.FromMinutes(3),
+                AccessTokenPath = "/login",
+                RefreshTokenPath = "/refresh",
                 SigningCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256),
                 //IdentityResolver = GetIdentity
             };
-
             app.UseMiddleware<TokenProviderMiddleware>(Options.Create(options));
 
             TokenValidationParameters param = new TokenValidationParameters()
@@ -143,10 +144,13 @@ namespace socnet
                 ValidateAudience = true,
                 ValidIssuer = "me",
                 ValidateIssuer = true,
-                //LifetimeValidator = _myTimeValidator,
+                LifetimeValidator = _myTimeValidator,
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
             };
+
+            app.UseMiddleware<RefreshTokenMiddleware>(Options.Create(options), param);
+
             app.UseJwtBearerAuthentication(new JwtBearerOptions()
             {
                 TokenValidationParameters = param,
@@ -154,8 +158,7 @@ namespace socnet
                 AutomaticChallenge = true,
             });
 
-            app.UseGroupMemberMiddleware();
-            app.UseGroupAdminMiddleware();
+            app.UseMemberMiddleware();
             app.UseCheckProfileOwnerMiddleware();
 
             app.UseStaticFiles();

@@ -24,9 +24,9 @@ namespace socnet.Data
         public DbSet<PostRate> PostRates { get; set; }
         public DbSet<Member> Members { get; set; }
 
-
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options):base(options)
         {
+
         }
 
         protected override void OnModelCreating(ModelBuilder builder)

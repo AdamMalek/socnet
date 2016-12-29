@@ -55,12 +55,6 @@ namespace socnet.Controllers
                 Response.WriteAsync("Error, group doesn't exist");
                 return null;
             }
-            if (!_memberService.IsMember(ProfileId, groupId.Value))
-            {
-                Response.StatusCode = 403;
-                Response.WriteAsync("You are not a member of this group");
-                return null;
-            }
             return _postService.GetPostsByGroup(groupId.Value);
         }
 
@@ -78,12 +72,6 @@ namespace socnet.Controllers
                 Response.WriteAsync("Error, group doesn't exist");
                 return null;
             }
-            if (!_memberService.IsMember(ProfileId, groupId.Value))
-            {
-                Response.StatusCode = 403;
-                Response.WriteAsync("You are not a member of this group");
-                return null;
-            }
             return _postService.GetPostById(postId);
         }
         // POST: api/Posts
@@ -98,11 +86,6 @@ namespace socnet.Controllers
             {
                 Response.StatusCode = 500;
                 Response.WriteAsync("Model state invalid");
-            }
-            else if (!_memberService.IsMember(ProfileId, groupId.Value))
-            {
-                Response.StatusCode = 403;
-                Response.WriteAsync("You are not a member of this group");
             }
             post.GroupId = groupId.Value;
             post.ProfileId = ProfileId;

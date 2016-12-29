@@ -18,22 +18,13 @@ namespace socnet.Infrastructure.Middleware
     {
         private readonly IGroupService _groupService;
         private readonly RequestDelegate _next;
-        private readonly IUserService _userService;
-        private readonly IMemberService _memberService;
-        private readonly ApplicationDbContext _db;
 
         public MemberMiddleware(
             RequestDelegate next,
-            IUserService userService,
-            IGroupService groupService,
-            IMemberService memberService,
-            ApplicationDbContext db)
+            IGroupService groupService)
         {
-            _db = db;
             _next = next;
-            _userService = userService;
             _groupService = groupService;
-            _memberService = memberService;
         }
 
         public Task Invoke(HttpContext context)
@@ -58,12 +49,11 @@ namespace socnet.Infrastructure.Middleware
                         id = grId.Value;
                     }
                 }
-                if (_memberService.IsMember(profileId, id))
+                if (context.User.HasClaim(x=> x.Type == "member" && x.Value == id.ToString()))
                 {
                     var member = new ClaimsIdentity();
                     member.AddClaim(new Claim(ClaimTypes.Role, "GroupMember"));
-                    var membership = _db.Members.FirstOrDefault(x => x.ProfileId == profileId && x.GroupId == id);
-                    if (_memberService.IsInRole(profileId, id, Models.MembershipLevel.Admin))
+                    if (context.User.HasClaim(x => x.Type == "admin" && x.Value == id.ToString()))
                     {
                         member.AddClaim(new Claim(ClaimTypes.Role, "GroupAdmin"));
                     }
