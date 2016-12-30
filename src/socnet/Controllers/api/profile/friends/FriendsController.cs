@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using socnet.Infrastructure.Service.Interfaces;
 using socnet.Models;
 using socnet.Infrastructure.Extensions;
+using socnet.Models.DTO;
 
 namespace socnet.Controllers.api.profile.friends
 {

@@ -1,3 +1,9 @@
-<h1>
-  {{title}}
-</h1>
+<socnet-header></socnet-header>
+<nav>
+    <a routerLink="/profile/1/friends" routerLinkActive="active">User</a>
+    <a routerLink="/profile/2/friends" routerLinkActive="active">Admin</a>
+    <a routerLink="/profile/3/friends" routerLinkActive="active">Test</a>
+</nav>
+<div class="container">
+    <router-outlet></router-outlet>
+</div>

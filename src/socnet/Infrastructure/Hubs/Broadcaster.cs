@@ -12,8 +12,9 @@ namespace socnet.Infrastructure.Hubs
         }
 
         // Server side methods called from client
-        public Task Subscribe(int matchId)
+        public  Task Subscribe(int matchId)
         {
+            Clients.All.AddFeed("ktos wbil");
             return Groups.Add(Context.ConnectionId, matchId.ToString());
         }
 

@@ -1,0 +1,13 @@
+.friend{
+    border: 1px solid black;
+    background: #888;
+    padding: 2px;
+}
+
+.friend-avatar{
+    height: 100px;
+}
+
+.friend-info{
+    text-align: left;
+}

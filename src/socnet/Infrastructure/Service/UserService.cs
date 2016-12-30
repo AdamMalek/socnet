@@ -11,6 +11,7 @@ using socnet.Config;
 using socnet.Infrastructure.Repository.Interfaces;
 using socnet.Infrastructure.Service.Interfaces;
 using socnet.Models;
+using socnet.Models.DTO;
 
 namespace socnet.Infrastructure.Service
 {

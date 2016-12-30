@@ -1,14 +1,14 @@
 {
   "/api": {
-    "target": "http://localhost:41940",
+    "target": "http://localhost:65498",
     "secure": false
   },
-  "/login": {
-    "target": "http://localhost:41940",
+"/login": {
+    "target": "http://localhost:65498",
     "secure": false
   },
-  "/refresh": {
-    "target": "http://localhost:41940",
+"/refresh": {
+    "target": "http://localhost:65498",
     "secure": false
   }
 }

@@ -124,6 +124,13 @@ namespace socnet
                 app.UseExceptionHandler("/Home/Error");
             }
 
+            app.UseCors(cors =>
+            {
+                cors.AllowAnyHeader();
+                cors.AllowAnyMethod();
+                cors.AllowAnyOrigin();
+            });
+
             app.UseApplicationInsightsExceptionTelemetry();
 
             var signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("tajnehaslo112123!@#"));
@@ -132,7 +139,7 @@ namespace socnet
             {
                 Audience = "users",
                 Issuer = "me",
-                AccessTokenExpiration = TimeSpan.FromMinutes(3),
+                AccessTokenExpiration = TimeSpan.FromDays(3),
                 AccessTokenPath = "/login",
                 RefreshTokenPath = "/refresh",
                 SigningCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256),

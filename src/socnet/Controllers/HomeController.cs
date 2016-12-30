@@ -20,6 +20,7 @@ using socnet.Data;
 using socnet.Infrastructure.Service.Interfaces;
 using socnet.Models;
 using socnet.Models.AccountViewModels;
+using socnet.Models.DTO;
 
 namespace socnet.Controllers
 {

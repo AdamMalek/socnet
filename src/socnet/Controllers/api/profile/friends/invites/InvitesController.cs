@@ -43,9 +43,8 @@ namespace socnet.Controllers.api.profile.friends.invites
             });
         }
 
-        
         // POST: api/Invites
-        [HttpPost]
+        [HttpPost("{inviteId}")]
         public void Post(int profileId, string inviteId)
         {
             if (!_profileService.InviteExistsForUser(profileId, inviteId)){

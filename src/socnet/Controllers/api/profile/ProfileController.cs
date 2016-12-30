@@ -29,6 +29,7 @@ namespace socnet.Controllers
         }
 
         [HttpGet("{profileId:int}", Name = "ProfileGet")]
+        [Authorize]
         public ProfileDTO Get(int profileId)
         {
             return _profileService.GetProfileById(profileId).ToDto();

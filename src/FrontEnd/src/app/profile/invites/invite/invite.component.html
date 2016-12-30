@@ -1,0 +1,13 @@
+<div class="invite row">
+    <div class="col-xs-4">
+        <img class="friend-avatar" [src]="invite.friend.avatarSrc"/>
+    </div>
+    <div class="friend-info col-xs-4">
+        <h3><a [routerLink]="'/profile/'+invite.friend.profileId + '/friends'">{{ fullName }}</a></h3>
+        <h5>{{ invite.friend.university }}</h5>
+    </div>
+    <div class="friend-commands col-xs-4">
+        <button class="btn success" (click)="acceptInvite(invite.inviteId)">Accept</button>
+        <button class="btn btn-danger" (click)="declineInvite(invite.inviteId)">Decline</button>
+    </div>
+</div>

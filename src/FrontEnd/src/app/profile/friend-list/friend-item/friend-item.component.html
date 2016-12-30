@@ -1,0 +1,9 @@
+<div class="friend row">
+    <div class="col-xs-4">
+        <img class="friend-avatar" [src]="friend.avatarSrc"/>
+    </div>
+    <div class="friend-info col-xs-8">
+        <h3><a [routerLink]="'/profile/'+friend.profileId + '/friends'">{{ fullName }}</a></h3>
+        <h5>{{ friend.university }}</h5>
+    </div>
+</div>
