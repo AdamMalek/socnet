@@ -44,6 +44,21 @@ namespace socnet.Infrastructure.Repository
             return query.Where(predicate).AsEnumerable();
         }
 
+        public bool AddRequest(GroupRequest req)
+        {
+            _db.Set<GroupRequest>().Add(req);
+            _db.SaveChanges();
+            return true;
+        }
+
+        public bool RemoveRequest(string id)
+        {
+            var req = _db.Set<GroupRequest>().FirstOrDefault(x => x.RequestId == id);
+            _db.Set<GroupRequest>().Remove(req);
+            _db.SaveChanges();
+            return true;
+        }
+
         public bool UpdateMember(Member member)
         {
             _db.Entry(member).State = Microsoft.EntityFrameworkCore.EntityState.Modified;

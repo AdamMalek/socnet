@@ -8,6 +8,7 @@ using socnet.Infrastructure.Service.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using socnet.Models;
 using System.Security.Claims;
+using socnet.Models.DTO;
 
 namespace socnet.Controllers
 {
@@ -40,19 +41,22 @@ namespace socnet.Controllers
         }
         // GET: api/Group/5
         [HttpGet("{id:int}", Name = "GetId")]
-        [Authorize(Roles = "GroupMember")]
-        public Group Get(int id)
+        public GroupDTO Get(int id)
         {
             var group = _groupService.GetGroupById(id, new string[] { "posts" });
             if (group == null)
             {
-                Response.StatusCode = 404;
+                Response.StatusCode = 204;
                 Response.WriteAsync("No group");
                 return null;
             }
             else
             {
-                return group;
+                return new GroupDTO
+                {
+                    groupId = group.GroupId,
+                    GroupName = group.GroupName
+                };
             }
         }
 
@@ -64,21 +68,33 @@ namespace socnet.Controllers
 
         [HttpGet("{slug}", Name = "GetSlug")]
         [Authorize(Roles = "GroupMember")]
-        public Group Get(string slug)
+        public GroupDTO Get(string slug)
         {
             var group = _groupService.GetGroupBySlug(slug, new string[] { "posts" });
             if (group == null)
             {
-                Response.StatusCode = 404;
+                Response.StatusCode = 204;
                 Response.WriteAsync("No group");
                 return null;
             }
-            else
+            return new GroupDTO
             {
-                return group;
-            }
+                groupId = group.GroupId,
+                GroupName = group.GroupName
+            };
         }
-
+        
+        [HttpGet("{slug}/id", Name = "GetIdBySlug")]
+        public int? GetId(string slug)
+        {
+            var group = _groupService.GetIdBySlug(slug);
+            return group;
+        }
+        [HttpGet("{groupId:int}/id")]
+        public int? GetId(int groupId)
+        {
+            return groupId;
+        }
         // POST: api/Group
         [HttpPost]
         [Authorize]

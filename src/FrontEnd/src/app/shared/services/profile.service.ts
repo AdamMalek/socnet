@@ -13,7 +13,7 @@ export class ProfileService {
     }
 
     getProfileInfo(id: number): Observable<UserData> {
-        return this.apiHttpService.get(BaseUrl + "/api/profile/" + id.toString()).map(x => x.json()).map(x => {
+        return this.apiHttpService.get("/api/profile/" + id.toString()).map(x => x.json()).map(x => {
             if (x != null){
                 x.avatarSrc = resolveAvatarPath(x.avatarSrc);
             }
@@ -22,7 +22,7 @@ export class ProfileService {
     }
 
     getProfileFriends(id: number) {
-        return this.apiHttpService.get(BaseUrl + "/api/profile/" + id.toString() + "/friends").map(x => x.json()).map(x=> {
+        return this.apiHttpService.get("/api/profile/" + id.toString() + "/friends").map(x => x.json()).map(x=> {
             for (let friend of x){
                 friend.avatarSrc = resolveAvatarPath(friend.avatarSrc);
             }

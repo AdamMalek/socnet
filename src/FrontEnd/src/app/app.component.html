@@ -1,9 +1,10 @@
 <socnet-header></socnet-header>
-<nav>
-    <a routerLink="/profile/1/friends" routerLinkActive="active">User</a>
-    <a routerLink="/profile/2/friends" routerLinkActive="active">Admin</a>
-    <a routerLink="/profile/3/friends" routerLinkActive="active">Test</a>
-</nav>
+<a (click)="login('user','P@$$w0rd');">User</a>
+<a (click)="login('admin','P@$$w0rd');">Admin</a>
+<a (click)="login('test','P@$$w0rd');">Test</a>|
+<input type="text" #route (input)="1==1"/>
+<a [routerLink]="route.value">Go</a>
+
 <div class="container">
     <router-outlet></router-outlet>
 </div>

@@ -1,0 +1,8 @@
+header {
+    width: 100%;
+    background: #ff0;
+    height: 50px;
+}
+ header h3{
+     float:left;
+ }

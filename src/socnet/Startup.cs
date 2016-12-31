@@ -140,7 +140,7 @@ namespace socnet
                 Audience = "users",
                 Issuer = "me",
                 AccessTokenExpiration = TimeSpan.FromDays(3),
-                AccessTokenPath = "/login",
+                AccessTokenPath = "/token",
                 RefreshTokenPath = "/refresh",
                 SigningCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256),
                 //IdentityResolver = GetIdentity

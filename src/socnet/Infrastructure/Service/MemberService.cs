@@ -116,5 +116,20 @@ namespace socnet.Infrastructure.Service
             member.Role = newRole;
             return _memberRepository.UpdateMember(member);
         }
+
+        public bool SendRequest(int groupId, int profileId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool AcceptRequest(string requestId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool DeclineRequest(string requestId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

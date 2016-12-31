@@ -1,0 +1,88 @@
+<form #form="ngForm">
+    <h4>Create a new account.</h4>
+    <hr/>
+
+    <div class="form-group">
+        <label for="username" class="col-md-2 control-label">Username</label>
+        <div class="col-md-10">
+            <input id="username" name="username" class="form-control" ngModel/>
+        </div>
+        <div class="text-danger">
+            <ul>
+                <li *ngFor="let validError of errors.username">{{ validError }}</li>
+            </ul>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="email" class="col-md-2 control-label">E-mail</label>
+        <div class="col-md-10">
+            <input id="email" type="text" name="email" class="form-control" ngModel/>
+        </div>
+        <div class="text-danger">
+            <ul>
+                <li *ngFor="let validError of errors.email">{{ validError }}</li>
+            </ul>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="password" class="col-md-2 control-label">Password</label>
+        <div class="col-md-10">
+            <input id="password" type="password" name="password" class="form-control" ngModel/>
+        </div>
+        <div class="text-danger">
+            <ul>
+                <li *ngFor="let validError of errors.password">{{ validError }}</li>
+            </ul>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="confirmPassword" class="col-md-2 control-label">Confirm password</label>
+        <div class="col-md-10">
+            <input id="confirmPassword" type="password" name="confirmPassword" class="form-control" ngModel/>
+        </div>
+        <div class="text-danger">
+            <ul>
+                <li *ngFor="let validError of errors.confirmPassword">{{ validError }}</li>
+            </ul>
+        </div>
+    </div>
+    <hr/>
+    <div class="form-group">
+        <label for="firstName" class="col-md-2 control-label">First Name</label>
+        <div class="col-md-10">
+            <input id="firstName" name="firstName" class="form-control" ngModel/>
+        </div>
+        <div class="text-danger">
+            <ul>
+                <li *ngFor="let validError of errors.firstName">{{ validError }}</li>
+            </ul>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="lastName" class="col-md-2 control-label">Last Name</label>
+        <div class="col-md-10">
+            <input id="lastName" name="lastName" class="form-control" ngModel/>
+        </div>
+        <div class="text-danger">
+            <ul>
+                <li *ngFor="let validError of errors.lastName">{{ validError }}</li>
+            </ul>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="university" class="col-md-2 control-label">University</label>
+        <div class="col-md-10">
+            <input id="university" name="university" class="form-control" ngModel/>
+        </div>
+        <div class="text-danger">
+            <ul>
+                <li *ngFor="let validError of errors.university">{{ validError }}</li>
+            </ul>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <button type="submit" (click)="submit(form.value);" class="btn btn-default">Register</button>
+        </div>
+    </div>
+</form>

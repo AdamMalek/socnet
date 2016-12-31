@@ -17,5 +17,6 @@ namespace socnet.Models
         public string GroupSlug { get; set; }
         public List<Member> Members { get; set; }
         public List<Post> Posts { get; set; }
+        public List<GroupRequest> Requests { get; set; }
     }
 }

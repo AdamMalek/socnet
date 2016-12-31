@@ -3,7 +3,7 @@
     "target": "http://localhost:65498",
     "secure": false
   },
-"/login": {
+"/token": {
     "target": "http://localhost:65498",
     "secure": false
   },
