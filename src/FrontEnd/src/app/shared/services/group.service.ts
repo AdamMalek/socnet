@@ -18,20 +18,34 @@ export class GroupService {
         }
     }
 
-    isMember(groupId): Observable<boolean> | boolean {
+    hasSentMembershipRequest(groupId) {
+        return this.apiHttp.get('/api/group/' + groupId + '/request/' + this.userDataService.getClaim("userId")).map(x => x.json());
+    }
+
+    getGroupData(groupId) {
+        return this.apiHttp.get('/api/group/' + groupId).map(x => x.json());
+    }
+
+    leaveGroup(groupId){
+        return this.apiHttp.delete('/api/group/' + groupId + '/members/'+ this.userDataService.getClaim("userId")).map(x=> x.json());
+    }
+
+    isMember(groupId): Observable<boolean> {
         return this.apiHttp.get('/api/group/' + groupId + '/id/').map(x => {
             let res = x.json();
             if (res == null) return false;
             let userGroups = this.userDataService.getClaim('member');
-            console.log("member");
-            console.log([].concat(userGroups).indexOf(res));
             if (userGroups == null) return false;
             return [].concat(userGroups).indexOf(res) >= 0;
         });
     }
 
-    getPosts(groupId){
-        return this.apiHttp.get('/api/group/'+groupId+'/posts').map(x=> x.json());
+    sendMembershipRequest(groupId) {
+        return this.apiHttp.post('/api/group/' + groupId + '/request', null);
+    }
+
+    getPosts(groupId) {
+        return this.apiHttp.get('/api/group/' + groupId + '/posts').map(x => x.json());
     }
 
     isAdmin(groupId: number): Observable<boolean> {

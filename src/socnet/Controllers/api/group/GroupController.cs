@@ -55,19 +55,14 @@ namespace socnet.Controllers
                 return new GroupDTO
                 {
                     groupId = group.GroupId,
-                    GroupName = group.GroupName
+                    GroupName = group.GroupName,
+                    GroupSlug = group.GroupSlug,
+                    Description = group.Description
                 };
             }
         }
-
-        [HttpGet("{groupId:int}/roles")]
-        public IEnumerable<string> GetRoles()
-        {
-            return User.Claims.Where(x => x.Type == ClaimTypes.Role).Select(x => x.Value);
-        }
-
+        
         [HttpGet("{slug}", Name = "GetSlug")]
-        [Authorize(Roles = "GroupMember")]
         public GroupDTO Get(string slug)
         {
             var group = _groupService.GetGroupBySlug(slug, new string[] { "posts" });
@@ -80,10 +75,12 @@ namespace socnet.Controllers
             return new GroupDTO
             {
                 groupId = group.GroupId,
-                GroupName = group.GroupName
+                GroupName = group.GroupName,
+                GroupSlug = group.GroupSlug,
+                Description = group.Description
             };
         }
-        
+
         [HttpGet("{slug}/id", Name = "GetIdBySlug")]
         public int? GetId(string slug)
         {

@@ -10,10 +10,6 @@ namespace socnet.Infrastructure.Service.Interfaces
 {
     public interface IMemberService
     {
-        bool SendRequest(int groupId, int profileId);
-        bool AcceptRequest(string requestId);
-        bool DeclineRequest(string requestId);
-        
         bool CreateMember(int groupId, int profileId, MembershipLevel role);
         bool RemoveMember(int membershipId);
         bool RemoveMember(int groupId, int profileId);

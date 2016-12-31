@@ -1,0 +1,9 @@
+<p *ngIf="groupExists">
+    <a id="group-btn" class="pull-right btn btn-lg" [class.btn-info]="!ready" [class.btn-danger]="(isGroupMember() || hasSentRequest()) && ready" [class.btn-success]="!isGroupMember() && ready"
+       (click)="clicked();">
+        <span *ngIf="ready && (!isGroupMember() && !hasSentRequest())">Request membership</span>
+        <span *ngIf="ready && (!isGroupMember() && hasSentRequest())">Cancel request</span>
+        <span *ngIf="ready && isGroupMember()">Leave group</span>
+        <span *ngIf="!ready"><img src="../../../assets/images/loading-small.svg"/> Please wait...</span>
+    </a>
+</p>

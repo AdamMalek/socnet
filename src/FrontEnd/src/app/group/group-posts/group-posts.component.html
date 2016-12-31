@@ -1,0 +1,9 @@
+<div class="container posts" *ngIf="isMember">
+    posts
+    <!--<div class="post" *ngFor="let post of posts">
+        <socnet-group-post [post]="post"></socnet-group-post>
+    </div>-->
+</div>
+<div class="container posts" *ngIf="!isMember">
+    join to browse
+</div>

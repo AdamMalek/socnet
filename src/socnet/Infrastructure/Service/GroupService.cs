@@ -15,9 +15,10 @@ namespace socnet.Infrastructure.Service
         private readonly IGroupRepository _groupRepository;
         private readonly IMemberService _memberService;
         private readonly IPostRepository _postRepository;
-        private readonly IProfileService _profileService; 
+        private readonly IProfileService _profileService;
 
-        public GroupService(IGroupRepository groupRepository, IProfileService profileService, IMemberService memberService, IPostRepository postRepository)
+        public GroupService(IGroupRepository groupRepository, IProfileService profileService,
+            IMemberService memberService, IPostRepository postRepository)
         {
             _memberService = memberService;
             _postRepository = postRepository;
@@ -35,7 +36,7 @@ namespace socnet.Infrastructure.Service
                     GroupName = sanitizeInput(name),
                     Members = new List<Member>
                     {
-                        new Member { Profile = user, Role = MembershipLevel.Admin }
+                        new Member {Profile = user, Role = MembershipLevel.Admin}
                     }
                 };
                 if (slug != null)
@@ -76,6 +77,10 @@ namespace socnet.Infrastructure.Service
                 {
                     includes.Add(x => x.Posts);
                 }
+                if (scope.Select(x => x.ToLower()).Contains("requests"))
+                {
+                    includes.Add(x => x.Requests);
+                }
 
                 if (includes.Count == 1)
                 {
@@ -109,6 +114,10 @@ namespace socnet.Infrastructure.Service
                 {
                     includes.Add(x => x.Posts);
                 }
+                if (scope.Select(x => x.ToLower()).Contains("requests"))
+                {
+                    includes.Add(x => x.Posts);
+                }
 
                 if (includes.Count == 1)
                 {
@@ -127,12 +136,12 @@ namespace socnet.Infrastructure.Service
 
         public IEnumerable<Profile> GetMembers(string slug)
         {
-            return _memberService.GetMembers(x => x.Group.GroupSlug == slug,x=> x.Group).Select(x=> x.Profile);
+            return _memberService.GetMembers(x => x.Group.GroupSlug == slug, x => x.Group).Select(x => x.Profile);
         }
 
         public IEnumerable<Profile> GetMembers(int id)
         {
-            return _memberService.GetGroupMembers(id).Select(x=> x.Profile);
+            return _memberService.GetGroupMembers(id).Select(x => x.Profile);
         }
 
         public IEnumerable<Profile> GetMembersWithRole(string slug, MembershipLevel role)
@@ -151,12 +160,12 @@ namespace socnet.Infrastructure.Service
         {
             if (group == null) return null;
 
-            return _memberService.GetMembers(x=> x.GroupId == group.GroupId && x.Role == role).Select(x => x.Profile);
+            return _memberService.GetMembers(x => x.GroupId == group.GroupId && x.Role == role).Select(x => x.Profile);
         }
 
         public IEnumerable<Group> GetUsersGroups(int profileId)
         {
-            var memberships = _memberService.GetMembers(x=> x.ProfileId == profileId,x=> x.Group);
+            var memberships = _memberService.GetMembers(x => x.ProfileId == profileId, x => x.Group);
             return memberships.Select(x => x.Group).AsEnumerable();
         }
 
@@ -181,9 +190,9 @@ namespace socnet.Infrastructure.Service
             return true;
         }
 
-        public bool SetSlug(int groupId, string slug="")
+        public bool SetSlug(int groupId, string slug = "")
         {
-            slug = sanitizeInput(slug).Replace(" ", "-").Replace(".","").Replace(",", "");
+            slug = sanitizeInput(slug).Replace(" ", "-").Replace(".", "").Replace(",", "");
 
             if (string.IsNullOrWhiteSpace(slug)) return false;
             if (slug[0] >= '0' && slug[0] <= '9') return false;
@@ -197,16 +206,83 @@ namespace socnet.Infrastructure.Service
             return true;
         }
 
-        public IEnumerable<Post> GetPosts(int groupId, int count, int skip, Expression<Func<Post, object>> orderBy, Expression<Func<Post, bool>> predicate = null)
+        public IEnumerable<Post> GetPosts(int groupId, int count, int skip, Expression<Func<Post, object>> orderBy,
+            Expression<Func<Post, bool>> predicate = null)
         {
             var group = GetGroupById(groupId, "posts");
             return GetPosts(group, count, skip, orderBy, predicate);
         }
 
-        public IEnumerable<Post> GetPosts(string slug, int count, int skip, Expression<Func<Post, object>> orderBy, Expression<Func<Post, bool>> predicate = null)
+        public IEnumerable<Post> GetPosts(string slug, int count, int skip, Expression<Func<Post, object>> orderBy,
+            Expression<Func<Post, bool>> predicate = null)
         {
             var group = GetGroupBySlug(slug, "posts");
             return GetPosts(group, count, skip, orderBy, predicate);
+        }
+
+        public IEnumerable<GroupRequest> GetRequests(int groupId)
+        {
+            var requests = _groupRepository.GetRequestsWhere(x => x.GroupId == groupId, x => x.Profile);
+            return requests;
+        }
+
+        public void SendRequest(int groupId, int profileId)
+        {
+            var group = GetGroupById(groupId, "requests");
+            if (group == null) throw new ArgumentException("Group doesn't exist.");
+            if (_memberService.IsMember(profileId, groupId))
+                throw new ArgumentException("You are already a member of this group!");
+            if (!_profileService.ProfileExists(profileId))
+                throw new ArgumentException("Profile with specified profileId doesn't exist!");
+            if (group.Requests.Any(x => x.ProfileId == profileId))
+                throw new ArgumentException("You already sent request for this group!");
+            var req = new GroupRequest
+            {
+                GroupId = groupId,
+                ProfileId = profileId,
+            };
+            try
+            {
+                _groupRepository.AddRequest(req);
+            }
+            catch (Exception)
+            {
+                throw new ArgumentException("Database error!");
+            }
+        }
+
+        public void AcceptRequest(string requestId)
+        {
+            var req = _groupRepository.GetRequestsWhere(x => x.RequestId == requestId).FirstOrDefault();
+            if (req == null) throw new ArgumentException("Request doesn't exist");
+            var group = GetGroupById(req.GroupId);
+            if (group == null || !_profileService.ProfileExists(req.ProfileId) ||
+                _memberService.IsMember(req.ProfileId, req.GroupId))
+            {
+                _groupRepository.RemoveRequest(requestId);
+                throw new ArgumentException("Invalid request data!");
+            }
+            try
+            {
+                _memberService.CreateMember(req.GroupId, req.ProfileId, MembershipLevel.User);
+                _groupRepository.RemoveRequest(requestId);
+            }
+            catch (Exception e)
+            {
+                throw new ArgumentException(e.Message);
+            }
+        }
+
+        public void DeclineRequest(string requestId)
+        {
+            try
+            {
+                _groupRepository.RemoveRequest(requestId);
+            }
+            catch (Exception e)
+            {
+                throw new ArgumentException(e.Message);
+            }
         }
 
         public IEnumerable<Post> GetPosts(Group group, int count, int skip, Expression<Func<Post, object>> orderBy, Expression<Func<Post, bool>> predicate = null)

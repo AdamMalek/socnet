@@ -14,8 +14,5 @@ namespace socnet.Infrastructure.Repository.Interfaces
         Member CreateMember(Member member);
         bool UpdateMember(Member member);
         bool DeleteMember(Member member);
-
-        bool AddRequest(GroupRequest req);
-        bool RemoveRequest(string id);
     }
 }

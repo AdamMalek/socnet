@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -50,7 +51,7 @@ namespace socnet.Controllers
                         LastName = x.Profile.LastName,
                         University = x.Profile.University,
                         ProfileId = x.Profile.ProfileId,
-                        Friends = x.Profile.Friends?.Select(f=> new Relation
+                        Friends = x.Profile.Friends?.Select(f => new Relation
                         {
                             FriendId = f.FriendId,
                             ProfileId = f.ProfileId,
@@ -70,7 +71,7 @@ namespace socnet.Controllers
         // POST: api/Members
         [HttpPost]
         [Authorize(Roles = "GroupAdmin")]
-        public void Post(string slug, int? groupId,AddMemberDTO member)
+        public void Post(string slug, int? groupId, AddMemberDTO member)
         {
             SetGroupId(slug, ref groupId);
             if (!groupId.HasValue)
@@ -130,32 +131,65 @@ namespace socnet.Controllers
 
         // DELETE: api/ApiWithActions/5
         [HttpDelete("{profileId:int}")]
-        [Authorize(Roles = "GroupAdmin")]
-        public void Delete(string slug, int? groupId, int profileId)
+        [Authorize]
+        public object Delete(string slug, int? groupId, int profileId)
         {
             SetGroupId(slug, ref groupId);
             if (!groupId.HasValue ||
                 !_memberService.IsMember(profileId, groupId.Value))
             {
                 Response.StatusCode = 404;
-                Response.WriteAsync("No group or member");
-                return;
+                return new
+                {
+                    status = "No group or member",
+                    deleted = false
+                };
             }
-            var result = _memberService.RemoveMember(groupId.Value,profileId);
-            if (result)
+            if (profileId != ProfileId && !IsInRole("GroupAdmin"))
             {
-                Response.StatusCode = 200;
-                Response.WriteAsync("Ok");
-                return;
+                Response.StatusCode = 403;
+                return new
+                {
+                    status = "Forbidden",
+                    deleted = false
+                };
             }
-            else
+            var result = _memberService.RemoveMember(groupId.Value, profileId);
+            if (!result)
             {
-                Response.StatusCode = 500;
-                Response.WriteAsync("Error");
-                return;
+                Response.StatusCode = 400;
+                return new
+                {
+                    status = "Error",
+                    deleted = false
+                };
             }
+            Response.StatusCode = 200;
+            return new
+            {
+                status = "OK",
+                deleted = true
+            };
         }
 
+        private int ProfileId
+        {
+            get
+            {
+                try
+                {
+                    return Convert.ToInt32(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "profileId").Value);
+                }
+                catch
+                {
+                    return -1;
+                }
+            }
+        }
+        private bool IsInRole(string roleName)
+        {
+            return User.HasClaim(x => x.Type == ClaimTypes.Role && x.Value == roleName);
+        }
         private void SetGroupId(string slug, ref int? groupId)
         {
             if (slug != null)

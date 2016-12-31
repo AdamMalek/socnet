@@ -31,7 +31,7 @@ namespace socnet.Infrastructure.Repository
 
         public bool DeleteGroup(int groupId)
         {
-            var group = GetById(groupId,x=> x.Members, x=> x.Posts);
+            var group = GetById(groupId, x => x.Members, x => x.Posts);
             if (group == null) return false;
             foreach (var member in group.Members)
             {
@@ -44,6 +44,39 @@ namespace socnet.Infrastructure.Repository
             _db.Groups.Remove(group);
             _db.SaveChanges();
             return true;
+        }
+
+        public bool AddRequest(GroupRequest req)
+        {
+            _db.Set<GroupRequest>().Add(req);
+            _db.SaveChanges();
+            return true;
+        }
+
+        public bool RemoveRequest(string id)
+        {
+            var req = _db.Set<GroupRequest>().FirstOrDefault(x => x.RequestId == id);
+            if (req == null) throw new ArgumentException("Request doesn't exist!");
+            _db.Set<GroupRequest>().Remove(req);
+            try
+            {
+                _db.SaveChanges();
+                return true;
+            }
+            catch (Exception)
+            {
+                throw new ArgumentException("Database error!");
+            }
+        }
+
+        public IEnumerable<GroupRequest> GetRequestsWhere(Expression<Func<GroupRequest, bool>> predicate, params Expression<Func<GroupRequest, object>>[] includes)
+        {
+            IQueryable<GroupRequest> query = _db.Set<GroupRequest>();
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+            return query.Where(predicate);
         }
 
         public Group GetById(int groupId, params Expression<Func<Group, object>>[] includes)

@@ -22,9 +22,16 @@ namespace socnet.Infrastructure.Repository
 
         public Member CreateMember(Member member)
         {
-            _db.Members.Add(member);
-            _db.SaveChanges();
-            return member;
+            try
+            {
+                _db.Members.Add(member);
+                _db.SaveChanges();
+                return member;
+            }
+            catch (Exception)
+            {
+                throw new ArgumentException("Database error while adding member to database!");
+            }
         }
 
         public bool DeleteMember(Member member)
@@ -42,21 +49,6 @@ namespace socnet.Infrastructure.Repository
                 query = query.Include(inc);
             }
             return query.Where(predicate).AsEnumerable();
-        }
-
-        public bool AddRequest(GroupRequest req)
-        {
-            _db.Set<GroupRequest>().Add(req);
-            _db.SaveChanges();
-            return true;
-        }
-
-        public bool RemoveRequest(string id)
-        {
-            var req = _db.Set<GroupRequest>().FirstOrDefault(x => x.RequestId == id);
-            _db.Set<GroupRequest>().Remove(req);
-            _db.SaveChanges();
-            return true;
         }
 
         public bool UpdateMember(Member member)

@@ -16,6 +16,9 @@ namespace socnet.Infrastructure.Repository.Interfaces
         Group UpdateGroup(Group group);
         Group CreateGroup(Group group);
 
+        bool AddRequest(GroupRequest req);
+        bool RemoveRequest(string id);
+        IEnumerable<GroupRequest> GetRequestsWhere(Expression<Func<GroupRequest, bool>> predicate, params Expression<Func<GroupRequest, object>>[] includes);
         IEnumerable<Member> GetMembers(Expression<Func<Member, bool>> predicate, params Expression<Func<Member, object>>[] includes);
     }
 }

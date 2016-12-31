@@ -80,6 +80,8 @@ namespace socnet.Migrations
                     b.Property<int>("GroupId")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<string>("Description");
+
                     b.Property<string>("GroupName")
                         .IsRequired()
                         .HasAnnotation("MaxLength", 50);
@@ -89,6 +91,23 @@ namespace socnet.Migrations
                     b.HasKey("GroupId");
 
                     b.ToTable("Groups");
+                });
+
+            modelBuilder.Entity("socnet.Models.GroupRequest", b =>
+                {
+                    b.Property<string>("RequestId");
+
+                    b.Property<int>("GroupId");
+
+                    b.Property<int>("ProfileId");
+
+                    b.HasKey("RequestId");
+
+                    b.HasIndex("GroupId");
+
+                    b.HasIndex("ProfileId");
+
+                    b.ToTable("GroupRequest");
                 });
 
             modelBuilder.Entity("socnet.Models.Invite", b =>
@@ -296,6 +315,19 @@ namespace socnet.Migrations
                     b.HasOne("socnet.Models.Comment", "Comment")
                         .WithMany("Rating")
                         .HasForeignKey("CommentId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("socnet.Models.Profile", "Profile")
+                        .WithMany()
+                        .HasForeignKey("ProfileId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("socnet.Models.GroupRequest", b =>
+                {
+                    b.HasOne("socnet.Models.Group", "Group")
+                        .WithMany("Requests")
+                        .HasForeignKey("GroupId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("socnet.Models.Profile", "Profile")

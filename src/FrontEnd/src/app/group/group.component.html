@@ -1,2 +1,32 @@
-GROUP XD
+<div class="jumbotron">
+    <h1>{{ groupName }}</h1>
+    <p class="lead">{{ groupDescription }}</p>
+    <socnet-group-button [ready]="ready" [isMember]="isMember" [groupExists]="groupExists"
+                         (requestMembership)="sendMembershipRequest();"
+                         (leaveGroup)="leaveGroup();"></socnet-group-button>
+</div>
+<div class="row">
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                        data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li routerLinkActive="active"><a [routerLink]="'/group/'+groupId+'/posts'">Posts</a></li>
+                    <li routerLinkActive="active"><a [routerLink]="'/group/'+groupId+'/members'">Members</a></li>
+                    <li routerLinkActive="active" *ngIf="isAdmin"><a [routerLink]="'/group/'+groupId+'/requests'">Requests</a></li>
+                    <li routerLinkActive="active" *ngIf="isAdmin"><a [routerLink]="'/group/'+groupId+'/settings'">Settings</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</div>
 <router-outlet></router-outlet>

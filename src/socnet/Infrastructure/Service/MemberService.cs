@@ -22,21 +22,30 @@ namespace socnet.Infrastructure.Service
             _groupRepository = groupRepo;
             _profileRepository = profileRepository;
         }
+
         public bool CreateMember(int groupId, int profileId, MembershipLevel role)
         {
             var group = _groupRepository.GetById(groupId);
-            if (group == null) return false;
+            if (group == null) throw new ArgumentException("Group doesn't exist!");
             var user = _profileRepository.GetProfileByPredicate(x => x.ProfileId == profileId);
-            if (user == null) return false;
-            if (IsMember(profileId, group.GroupId)) return false;
+            if (user == null) throw new ArgumentException("Profile doesn't exist!");
+            if (IsMember(profileId, group.GroupId))
+                throw new ArgumentException("Profile already a member of this group!");
             Member newMember = new Member
             {
                 GroupId = groupId,
                 ProfileId = profileId,
                 Role = role
             };
-            _memberRepository.CreateMember(newMember);
-            return true;
+            try
+            {
+                _memberRepository.CreateMember(newMember);
+                return true;
+            }
+            catch (Exception e)
+            {
+                throw new ArgumentException(e.Message);
+            }
         }
 
         public IEnumerable<Member> GetMembers(Expression<Func<Member, bool>> predicate, params Expression<Func<Member, object>>[] includes)
@@ -115,21 +124,6 @@ namespace socnet.Infrastructure.Service
             }
             member.Role = newRole;
             return _memberRepository.UpdateMember(member);
-        }
-
-        public bool SendRequest(int groupId, int profileId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool AcceptRequest(string requestId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool DeclineRequest(string requestId)
-        {
-            throw new NotImplementedException();
         }
     }
 }

@@ -10,6 +10,10 @@ namespace socnet.Infrastructure.Service.Interfaces
 {
     public interface IGroupService
     {
+        void SendRequest(int groupId, int profileId);
+        void AcceptRequest(string requestId);
+        void DeclineRequest(string requestId);
+
         Group GetGroupById(int id,string[] scope = null);
         int? GetIdBySlug(string slug);
         Group GetGroupBySlug(string slug, string[] scope = null);
@@ -28,5 +32,6 @@ namespace socnet.Infrastructure.Service.Interfaces
 
         IEnumerable<Post> GetPosts(int groupId, int count, int skip, Expression<Func<Post,object>> orderBy ,Expression<Func<Post, bool>> predicate = null);
         IEnumerable<Post> GetPosts(string slug, int count, int skip, Expression<Func<Post,object>> orderBy ,Expression<Func<Post, bool>> predicate = null);
+        IEnumerable<GroupRequest> GetRequests(int groupId);
     }
 }

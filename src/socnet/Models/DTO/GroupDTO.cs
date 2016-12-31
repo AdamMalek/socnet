@@ -9,5 +9,7 @@ namespace socnet.Models.DTO
     {
         public int groupId { get; set; }
         public string GroupName { get; set; }
+        public string GroupSlug { get; set; }
+        public string Description { get; set; }
     }
 }

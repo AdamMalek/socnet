@@ -26,6 +26,11 @@ import { GroupComponent } from './group/group.component';
 import { GroupMembersComponent } from './group/group-members/group-members.component';
 import { GroupAdminComponent } from './group/group-admin/group-admin.component';
 import {GroupAdminGuard} from "./shared/guards/group-admin.guard";
+import {NotificationService} from "./shared/services/notification.service";
+import { GroupButtonComponent } from './group/group-button/group-button.component';
+import { GroupPostsComponent } from './group/group-posts/group-posts.component';
+import { GroupPostComponent } from './group/group-posts/group-post/group-post.component';
+import { GroupCommentComponent } from './group/group-posts/group-post/group-comment/group-comment.component';
 
 @NgModule({
     declarations: [
@@ -41,6 +46,10 @@ import {GroupAdminGuard} from "./shared/guards/group-admin.guard";
         GroupComponent,
         GroupMembersComponent,
         GroupAdminComponent,
+        GroupButtonComponent,
+        GroupPostsComponent,
+        GroupPostComponent,
+        GroupCommentComponent,
     ],
     imports: [
         BrowserModule,
@@ -49,7 +58,8 @@ import {GroupAdminGuard} from "./shared/guards/group-admin.guard";
         RouterModule.forRoot(appRoutes),
     ],
     providers: [ProfileService, ApiHttpService,TokenService,
-                UserDataService, LoggedInGuard, GroupMemberGuard, GroupAdminGuard ,GroupService],
+                UserDataService, LoggedInGuard, GroupMemberGuard, GroupAdminGuard ,GroupService,
+                NotificationService],
     bootstrap: [AppComponent]
 })
 export class AppModule {
