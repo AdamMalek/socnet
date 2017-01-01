@@ -2,6 +2,9 @@ import {Injectable} from '@angular/core';
 import {ApiHttpService} from "./api-http.service";
 import {UserDataService} from "./user-data.service";
 import {Observable} from "rxjs";
+import {resolveAvatarPath} from "./helpers";
+import {IGroupPost} from "../../group/group-posts/models/group-post.model";
+import {IGroupMember} from "../../group/group-members/models/group-member.model";
 
 @Injectable()
 export class GroupService {
@@ -9,13 +12,24 @@ export class GroupService {
     constructor(private userDataService: UserDataService, private apiHttp: ApiHttpService) {
     }
 
-    getMembers(groupId: number, count: number, skip: number) {
-        if (this.isMember(groupId)) {
+    getMembers(groupId): Observable<IGroupMember[]> {
+        return this.apiHttp.get('/api/group/' + groupId + '/members').map(response => {
+            if (response.status == 200){
+                return <IGroupMember[]>response.json();
+            }
+            else {
+                return [];
+            }
+        }).map(x=>{
+            for (let member of x){
+                member.profile.avatarSrc = resolveAvatarPath(member.profile.avatarSrc);
+            }
+            return x;
+        });
+    }
 
-        }
-        else {
-            return [];
-        }
+    groupExist(groupId): Observable<boolean> {
+        return this.apiHttp.get('/api/group/' + groupId + '/id/').map(x => x.status == 200);
     }
 
     hasSentMembershipRequest(groupId) {
@@ -26,8 +40,8 @@ export class GroupService {
         return this.apiHttp.get('/api/group/' + groupId).map(x => x.json());
     }
 
-    leaveGroup(groupId){
-        return this.apiHttp.delete('/api/group/' + groupId + '/members/'+ this.userDataService.getClaim("userId")).map(x=> x.json());
+    leaveGroup(groupId) {
+        return this.apiHttp.delete('/api/group/' + groupId + '/members/' + this.userDataService.getClaim("userId")).map(x => x.json());
     }
 
     isMember(groupId): Observable<boolean> {
@@ -45,7 +59,21 @@ export class GroupService {
     }
 
     getPosts(groupId) {
-        return this.apiHttp.get('/api/group/' + groupId + '/posts').map(x => x.json());
+        return this.apiHttp.get('/api/group/' + groupId + '/posts').map(x => x.json()).map(posts => {
+            for (let post of <IGroupPost[]>posts) {
+                if (post.profile) {
+                    post.profile.avatarSrc = resolveAvatarPath(post.profile.avatarSrc);
+                }
+                if (post.comments) {
+                    for (let comment of post.comments) {
+                        if (comment.profile) {
+                            comment.profile.avatarSrc = resolveAvatarPath(comment.profile.avatarSrc);
+                        }
+                    }
+                }
+            }
+            return posts;
+        });
     }
 
     isAdmin(groupId: number): Observable<boolean> {
@@ -53,8 +81,6 @@ export class GroupService {
             let res = x.json();
             if (res == null) return false;
             let userGroups = this.userDataService.getClaim('admin');
-            console.log("admin");
-            console.log([].concat(userGroups).indexOf(res));
             if (userGroups == null) return false;
             return [].concat(userGroups).indexOf(res) >= 0;
         });

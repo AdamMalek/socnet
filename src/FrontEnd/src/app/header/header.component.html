@@ -1,100 +1,14 @@
-<!--<div class="topbar">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-2 left-side left">
-                <div class="topbar-menu-left">
-                    <li id="sidebar-toggle" data-toggle="0">
-                        <a role="button" data-target="#"> <i class="fa fa-th-list"></i></a>
-                    </li>
-                </div>
-            </div>
-            <div class="col-md-7 site-name text-center hidden-xs hidden-sm">
-                <span><a href="http://test.dev/">socnet</a></span>
-            </div>
-            <div class="col-md-3 text-right right-side">
-                <div class="topbar-menu-right">
-                    <li class="ossn-topbar-dropdown-menu">
-                        <div class="dropdown">
-                            <a role="button" data-toggle="dropdown" data-target="#"><i class="fa fa-sort-desc"></i></a>
-                            <ul class="dropdown-menu multi-level" role="menu" aria-labelledby="dropdownMenu">
-                                <li><a class="menu-topbar-dropdown-account_settings"
-                                       href="http://test.dev/u/testaccountXD/edit">Account Settings</a></li>
-                                <li><a class="menu-topbar-dropdown-logout"
-                                       href="http://test.dev/action/user/logout?ossn_ts=1483038027&amp;ossn_token=49d507df3e7384589b9f17d68e117475">Log
-                                    out</a></li>
-                            </ul>
-                        </div>
-                    </li>
-                    <li id="ossn-notif-friends">
-                        <a onclick="Ossn.NotificationFriendsShow(this);" class="ossn-notifications-friends"
-                           href="javascript:void(0);">
-                       <span>
-                                                <span class="ossn-notification-container hidden"></span>
-                          <div class="ossn-icon ossn-icons-topbar-friends"><i class="fa fa-users"></i></div>
-                                             </span>
-                        </a>
-                    </li>
-                    <li id="ossn-notif-messages">
-                        <a onclick="Ossn.NotificationMessagesShow(this)" href="javascript:void(0);"
-                           class="ossn-notifications-messages" role="button" data-toggle="dropdown">
+<!-- <li class="pull-right" *ngIf="loggedIn"><a [routerLink]="'/profile/'+ profileId">{{ username }}</a></li>
+<li class="pull-right" *ngIf="loggedIn"><a (click)="logout();">Logout</a></li>
+<li class="pull-right" *ngIf="!loggedIn"><a routerLink="/register">Register</a></li>
+<li class="pull-right" *ngIf="!loggedIn"><a routerLink="/login">Login</a></li> -->
+<md-toolbar color="primary" class="md-elevation-z3">
+    <span>Socnet</span>
 
-                       <span>
-                                                    <span class="ossn-notification-container hidden"></span>
-                            <div class="ossn-icon ossn-icons-topbar-messages"><i class="fa fa-envelope"></i></div>
-                                               </span>
-                        </a></li>
+    <span class="filling"></span>
 
-                    <li id="ossn-notif-notification">
-                        <a href="javascript:void(0);" onclick="Ossn.NotificationShow(this)"
-                           class="ossn-notifications-notification" role="button" data-toggle="dropdown">
-                       <span>
-                                                  <span class="ossn-notification-container hidden"></span>
-                           <div class="ossn-icon ossn-icons-topbar-notification"><i class="fa fa-globe"></i></div>
-                                              </span>
-                        </a>
-
-                    </li>
-                    <div class="dropdown">
-                        <div class="dropdown-menu multi-level dropmenu-topbar-icons ossn-notifications-box">
-                            <div class="selected"></div>
-                            <div class="type-name"> Notifications</div>
-                            <div class="metadata">
-                                <div style="height: 66px;">
-                                    <div class="ossn-loading ossn-notification-box-loading"></div>
-                                </div>
-                                <div class="bottom-all">
-                                    <a href="#">See All</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
--->
-<nav class="navbar navbar-inverse navbar-fixed-top">
-    <div class="container">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="#">Project name</a>
-        </div>
-        <div id="navbar" class="collapse navbar-collapse">
-            <ul class="nav navbar-nav">
-                <li class="active"><a href="#">Home</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#contact">Contact</a></li>
-                <li class="pull-right" *ngIf="loggedIn"><a [routerLink]="'/profile/'+ profileId">{{ username }}</a></li>
-                <li class="pull-right" *ngIf="loggedIn"><a (click)="logout();">Logout</a></li>
-                <li class="pull-right" *ngIf="!loggedIn"><a routerLink="/register">Register</a></li>
-                <li class="pull-right" *ngIf="!loggedIn"><a routerLink="/login">Login</a></li>
-            </ul>
-        </div><!--/.nav-collapse -->
-    </div>
-</nav>
+    <span *ngIf="loggedIn"><span [routerLink]="'/profile/'+ profileId">{{ username }}</span></span>
+    <span *ngIf="loggedIn"><a (click)="logout();">Logout</a></span>
+    <span *ngIf="!loggedIn"><a routerLink="/register">Register</a></span>
+    <span *ngIf="!loggedIn"><a routerLink="/login">Login</a></span>
+</md-toolbar>

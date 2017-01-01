@@ -3,6 +3,7 @@ import {ActivatedRoute} from "@angular/router";
 import {GroupService} from "../shared/services/group.service";
 import {Subscription, Subscriber} from "rxjs";
 import {EGroupStatus} from "./group-status.enum";
+import {UserDataService} from "../shared/services/user-data.service";
 
 @Component({
     selector: 'socnet-group',
@@ -11,17 +12,15 @@ import {EGroupStatus} from "./group-status.enum";
 })
 export class GroupComponent implements OnInit,OnDestroy {
 
-    constructor(private route: ActivatedRoute, private groupService: GroupService) {
+    constructor(private route: ActivatedRoute, private groupService: GroupService,private userService:UserDataService) {
     }
     sub: Subscription;
-    postSub: Subscription;
     isMember = EGroupStatus.NotMember;
     isAdmin:boolean;
     groupId = -1;
     groupExists = false;
     groupName;
     groupDescription;
-    posts;
 
     ready = true;
 
@@ -46,10 +45,6 @@ export class GroupComponent implements OnInit,OnDestroy {
                                 this.isAdmin = res;
                             });
                             this.isMember = EGroupStatus.Member;
-                            this.postSub = this.groupService.getPosts(this.groupId).subscribe(posts => {
-                                console.log(posts);
-                                this.posts = posts;
-                            });
                         }
                         else{
                             this.groupService.hasSentMembershipRequest(this.groupId).subscribe(res=>{
@@ -71,14 +66,10 @@ export class GroupComponent implements OnInit,OnDestroy {
         if (this.groupId != -1) { // != -1 !!!!!!!!!!!!!!!!
             this.ready = false;
             this.groupService.sendMembershipRequest(this.groupId).subscribe(res => {
-                    console.log("success");
-                    console.log(res.json());
                     this.isMember = EGroupStatus.RequestSent;
                     this.ready = true;
                 },
                 err => {
-                    console.log("error");
-                    console.log(err.json());
                     this.ready = true;
                 });
         }
@@ -98,22 +89,16 @@ export class GroupComponent implements OnInit,OnDestroy {
             this.groupService.leaveGroup(this.groupId).subscribe(res=>{
                 if (res.deleted){
                     this.isMember = EGroupStatus.NotMember;
+                    this.userService.refreshToken();
                     this.ready = true;
                 }
             },err=>{
-                console.log("cant leave");
-                console.log(err);
                 this.ready = true;
             });
         }
-
-
-        this.ready = false;
-        setTimeout(()=>{this.isMember=EGroupStatus.NotMember;this.ready = true;},10000);
     }
 
     ngOnDestroy() {
         if (this.sub) this.sub.unsubscribe();
-        if (this.postSub) this.postSub.unsubscribe();
     }
 }

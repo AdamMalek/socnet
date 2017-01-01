@@ -14,6 +14,7 @@ export class GroupPostComponent implements OnInit {
     @Input() post:IGroupPost;
 
     ngOnInit() {
+        console.log(this.post);
     }
 
     upvotePost(){

@@ -15,6 +15,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
     logoutSub;
     loginSub;
 
+    isDarkTheme=true;
+
     login(username, password) {
         this.userService.logIn(username,password);
     }

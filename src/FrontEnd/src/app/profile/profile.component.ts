@@ -4,7 +4,6 @@ import {UserData} from "../shared/models/user-data";
 import {ActivatedRoute} from "@angular/router";
 import {InviteService} from "../shared/services/invite.service";
 
-
 @Component({
     selector: 'app-profile',
     templateUrl: './profile.component.html',

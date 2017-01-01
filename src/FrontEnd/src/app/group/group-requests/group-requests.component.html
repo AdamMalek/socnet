@@ -1,0 +1,16 @@
+<h1>Membership requests:</h1>
+
+<p *ngIf="loading">loading...</p>
+
+<h3 *ngIf="!loading && (requests.length == 0)">No requests</h3>
+
+<ul *ngIf="(requests.length > 0) && !loading">
+    <li *ngFor="let request of requests">
+        <div class="request">
+            <p>{{ request.profile.firstName+' '+request.profile.lastName }}</p>
+            <button md-button (click)="accept(request.requestId)">Accept</button>
+            <button md-button (click)="decline(request.requestId)">Decline</button>
+        </div>
+    </li>
+</ul>
+

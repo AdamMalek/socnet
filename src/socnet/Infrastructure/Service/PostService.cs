@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using socnet.Infrastructure.Extensions;
 using socnet.Models;
 using socnet.Models.DTO;
 using socnet.Infrastructure.Repository.Interfaces;
@@ -94,7 +95,7 @@ namespace socnet.Infrastructure.Service
 
         public IEnumerable<CommentDTO> GetComments(int postId)
         {
-            return _commentRepository.GetCommentsByQuery(x => x.PostId == postId,x=>x.Post).Select(x => toDTO(x));
+            return _commentRepository.GetCommentsByQuery(x => x.PostId == postId,x=>x.Post,x=> x.Profile).Select(toDTO);
         }
 
         public PostDTO GetPostById(int postId)
@@ -106,17 +107,17 @@ namespace socnet.Infrastructure.Service
         public IEnumerable<PostDTO> GetPostsByGroup(string slug)
         {
             var posts = _postRepository.GetPostsWhere(x => x.Group.GroupSlug == slug);
-            return posts.Select(x => toDTO(x));
+            return posts.Select(toDTO);
         }
 
         public IEnumerable<PostDTO> GetPostsByGroup(int groupId)
         {
-            return _postRepository.GetPostsForGroup(groupId).Select(x => toDTO(x));
+            return _postRepository.GetPostsForGroup(groupId).Select(toDTO);
         }
 
         public IEnumerable<PostDTO> GetPostsByUser(int profileId)
         {
-            return _postRepository.GetPostsWhere(x => x.ProfileId == profileId).Select(x => toDTO(x));
+            return _postRepository.GetPostsWhere(x => x.ProfileId == profileId).Select(toDTO);
         }
 
         public bool RateComment(int commentId, int profileId, RateType vote)
@@ -187,6 +188,10 @@ namespace socnet.Infrastructure.Service
                 Content = comm.Body,
                 GroupId = comm.Post.GroupId
             };
+            if (comm.Profile != null)
+            {
+                dto.Profile = comm.Profile.ToDto();
+            }
             if (comm.Rating != null)
             {
                 var ups = comm.Rating.Count(x => x.Value == RateType.UpVote);
@@ -222,6 +227,10 @@ namespace socnet.Infrastructure.Service
                 var ups = post.Rating.Count(x => x.Value == RateType.UpVote);
                 var downs = post.Rating.Count(x => x.Value == RateType.DownVote);
                 dto.Rating = ups - downs;
+            }
+            if (post.Profile != null)
+            {
+                dto.Profile = post.Profile.ToDto();
             }
             if (post.Comments != null)
             {

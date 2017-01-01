@@ -1,19 +1,33 @@
+<!-- <form #form="ngForm">
+    <md-input-container>
+        <input name="username" md-input placeholder="Username" ngModel/>
+    </md-input-container>
+    <md-input-container password>
+        <input name="password" type="password" md-input placeholder="Password" ngModel/>
+    </md-input-container>
+    <button md-button type="submit" (click)="submit(form.value);" class="btn btn-default">Login</button>
+</form> -->
+
 <form #form="ngForm">
     <div class="form-group">
         <label for="username" class="col-md-2 control-label">Username</label>
         <div class="col-md-10">
-            <input id="username" type="text" name="username" class="form-control" ngModel/>
+            <md-input-container>
+                <input id="username" md-input type="text" name="username" placeholder="Username" class="form-control" ngModel/>
+            </md-input-container>
         </div>
     </div>
     <div class="form-group">
         <label for="password" class="col-md-2 control-label">Password</label>
         <div class="col-md-10">
-            <input id="password" type="password" name="password" class="form-control" ngModel/>
+            <md-input-container>
+                <input name="password" id="password" md-input placeholder="Password" type="password"  class="form-control" ngModel/>
+            </md-input-container>
         </div>
     </div>
     <div class="form-group">
         <div class="col-md-offset-2 col-md-10">
-            <button type="submit" (click)="submit(form.value);" class="btn btn-default">Login</button>
+            <button md-button type="submit" (click)="submit(form.value);" class="btn btn-default">Login</button>
         </div>
     </div>
 </form>

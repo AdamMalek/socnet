@@ -1,54 +1,21 @@
-<div class="ossn-comments-list-1">
-    <div class="comments-item" id="comments-item-1">
-        <div class="row">
-            <div class="col-md-1">
-                <img class="comment-user-img" src="http://test.dev/avatar/testaccountXD/smaller/22b48a02931f3288407e3e2e66b8542d.jpeg">
+<div class="comment row">
+    <div class="col-sm-offset-2">
+        <div class="comment-header row">
+            <div class="col-sm-4">
+                <img [src]="comment.profile.avatarSrc" class="img img-responsive" style="max-height: 40px;">
             </div>
-            <div class="col-md-11">
-
-                <div class="comment-contents">
-                    <p>
-                        <a class="owner-link" href="http://test.dev/u/testaccountXD">test test</a> dsadsa dasd,        </p>
-                    <div class="comment-metadata">
-                        <div class="time-created">2 days ago</div>
-                        <a class="ossn-like-comment" data-type="Like" href="http://test.dev/action/annotation/like?annotation=1&amp;ossn_ts=1483223623&amp;ossn_token=22039f8edf6a0d10a794dc4fb8b27cba">Like</a><a onclick="Ossn.ViewLikes(1, 'annotation')" class="ossn-total-likes ossn-total-likes-1" data-likes="" href="javascript:void(0);"></a>                     <div class="ossn-comment-menu">
-                        <div class="dropdown">
-                            <a id="dLabel" role="button" data-toggle="dropdown" data-target="#">
-                                <i class="fa fa-sort-desc"></i>
-                            </a>
-                            <ul class="dropdown-menu multi-level" role="menu" aria-labelledby="dropdownMenu">
-                                <li><a data-guid="1" class="ossn-edit-comment" href="javascript:void(0);">Edit</a></li>    </ul>
-                        </div>
-                    </div>
-                    </div>
-                </div>
+            <div class="col-sm-8">
+                <h3>{{ comment.profile.firstName + ' ' + comment.profile.lastName }}</h3>
             </div>
         </div>
-    </div>
-
-    <div class="comments-item" id="comments-item-2">
-        <div class="row">
-            <div class="col-md-1">
-                <img class="comment-user-img" src="http://test.dev/avatar/testaccountXD/smaller/22b48a02931f3288407e3e2e66b8542d.jpeg">
+        <div class="comment-content row">
+            <div class="col-sm-9">
+                <p>{{ comment.content }}</p>
             </div>
-            <div class="col-md-11">
-
-                <div class="comment-contents">
-                    <p>
-                        <a class="owner-link" href="http://test.dev/u/testaccountXD">test test</a> dsadas das das&nbsp;        </p>
-                    <div class="comment-metadata">
-                        <div class="time-created">2 days ago</div>
-                        <a class="ossn-like-comment" data-type="Like" href="http://test.dev/action/annotation/like?annotation=2&amp;ossn_ts=1483223624&amp;ossn_token=1a1dc268207ac2cd1e9094293fcc4e94">Like</a><a onclick="Ossn.ViewLikes(2, 'annotation')" class="ossn-total-likes ossn-total-likes-2" data-likes="" href="javascript:void(0);"></a>                     <div class="ossn-comment-menu">
-                        <div class="dropdown">
-                            <a id="dLabel" role="button" data-toggle="dropdown" data-target="#">
-                                <i class="fa fa-sort-desc"></i>
-                            </a>
-                            <ul class="dropdown-menu multi-level" role="menu" aria-labelledby="dropdownMenu">
-                                <li><a data-guid="2" class="ossn-edit-comment" href="javascript:void(0);">Edit</a></li>    </ul>
-                        </div>
-                    </div>
-                    </div>
-                </div>
+            <div class="col-sm-3">
+                <span>+</span>
+                <span>{{ comment.rating }}</span>
+                <span>-</span>
             </div>
         </div>
     </div>

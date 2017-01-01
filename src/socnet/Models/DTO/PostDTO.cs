@@ -12,7 +12,7 @@ namespace socnet.Models.DTO
         public int GroupId { get; set; }
         public int Rating { get; set; }
         public string Content { get; set; }
-
+        public ProfileDTO Profile { get; set; }
         public List<CommentDTO> Comments { get; set; }
     }
 }

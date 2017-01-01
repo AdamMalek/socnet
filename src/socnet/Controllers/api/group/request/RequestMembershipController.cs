@@ -122,6 +122,7 @@ namespace socnet.Controllers.api.group.request
                 Response.StatusCode = 204;
                 return new
                 {
+                    success = false,
                     status = "No group"
                 };
             }
@@ -131,6 +132,7 @@ namespace socnet.Controllers.api.group.request
                 Response.StatusCode = 200;
                 return new
                 {
+                    success = true,
                     status = "OK"
                 };
             }
@@ -139,6 +141,7 @@ namespace socnet.Controllers.api.group.request
                 Response.StatusCode = 400;
                 return new
                 {
+                    success = false,
                     status = e.Message
                 };
             }

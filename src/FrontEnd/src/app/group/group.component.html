@@ -1,4 +1,4 @@
-<div class="jumbotron">
+<div class="jumbotron row md-elevation-z4">
     <h1>{{ groupName }}</h1>
     <p class="lead">{{ groupDescription }}</p>
     <socnet-group-button [ready]="ready" [isMember]="isMember" [groupExists]="groupExists"
@@ -6,7 +6,7 @@
                          (leaveGroup)="leaveGroup();"></socnet-group-button>
 </div>
 <div class="row">
-    <nav class="navbar navbar-default">
+    <nav class="navbar navbar-default col-sm-12">
         <div class="container-fluid">
             <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">

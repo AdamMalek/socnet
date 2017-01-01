@@ -1,3 +1,11 @@
-<p>
-  group-members works!
-</p>
+<h2>Members</h2>
+
+<h3>Admins</h3>
+<ul>
+    <li *ngFor="let member of admins">{{ member.profile.firstName + ' ' + member.profile.lastName }}</li>
+</ul>
+
+<h3>Members</h3>
+<ul>
+    <li *ngFor="let member of members">{{ member.profile.firstName + ' ' + member.profile.lastName }}</li>
+</ul>

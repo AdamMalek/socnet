@@ -1,6 +1,7 @@
 import {Component, OnInit, Input, OnDestroy} from '@angular/core';
 import {ActivatedRoute} from "@angular/router";
 import {GroupService} from "../../shared/services/group.service";
+import {IGroupPost} from "./models/group-post.model";
 
 @Component({
     selector: 'socnet-group-posts',
@@ -14,9 +15,10 @@ export class GroupPostsComponent implements OnInit, OnDestroy {
     }
 
     isMember;
-    posts;
+    posts: IGroupPost[]=[];
     groupId;
     groupIdSub;
+    loading = true;
 
     ngOnInit() {
         this.groupIdSub = this.route.parent.params.subscribe(params => {
@@ -24,9 +26,11 @@ export class GroupPostsComponent implements OnInit, OnDestroy {
 
             this.groupService.isMember(this.groupId).subscribe(res => {
                 if (res) {
+                    this.loading = true;
                     this.isMember = true;
                     this.groupService.getPosts(this.groupId).subscribe(posts => {
-                        this.posts = posts;
+                        this.posts = <IGroupPost[]>posts;
+                        this.loading = false;
                     });
                 }
                 else {

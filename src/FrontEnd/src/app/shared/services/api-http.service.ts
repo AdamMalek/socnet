@@ -11,6 +11,7 @@ export class ApiHttpService {
     }
 
     post(url: string, body: any): Observable<Response> {
+        console.log('post: ' + url);
         let headers = new Headers({
             'Authorization': 'Bearer ' + this.tokenService.getAccessToken(),
             'Content-Type': 'application/x-www-form-urlencoded'
@@ -20,7 +21,7 @@ export class ApiHttpService {
     }
 
     get(url: string): Observable<Response> {
-
+        console.log('get: ' + url);
         let headers = new Headers({
             'Authorization': 'Bearer ' + this.tokenService.getAccessToken(),
         });
@@ -29,7 +30,7 @@ export class ApiHttpService {
     }
 
     delete(url: string): Observable<Response> {
-
+        console.log('delete: ' + url);
         let headers = new Headers({
             'Authorization': 'Bearer ' + this.tokenService.getAccessToken(),
         });

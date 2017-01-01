@@ -15,5 +15,6 @@ namespace socnet.Models.DTO
         public int Rating { get; set; }
         [Required]
         public string Content { get; set; }
+        public ProfileDTO Profile { get; set; }
     }
 }

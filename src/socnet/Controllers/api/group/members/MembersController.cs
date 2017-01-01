@@ -15,22 +15,20 @@ namespace socnet.Controllers
     [Produces("application/json")]
     [Route("api/group/{groupId:int}/members", Name = "MembersId")]
     [Route("api/group/{slug}/members", Name = "MembersSlug")]
-    [Authorize(Roles = "GroupMember")]
-    public class MembersController : Controller
+    [Authorize]
+    public class MembersController : GroupBaseController
     {
         private readonly IMemberService _memberService;
-        private readonly IGroupService _groupService;
         private readonly IProfileService _profileService;
 
-        public MembersController(IMemberService memberService, IGroupService groupService, IProfileService profileService)
+        public MembersController(IMemberService memberService, IGroupService groupService, IProfileService profileService):base(groupService)
         {
             _memberService = memberService;
-            _groupService = groupService;
             _profileService = profileService;
         }
         // GET: api/Members
         [HttpGet]
-        public IEnumerable<Member> Get(string slug, int? groupId)
+        public IEnumerable<MemberDTO> Get(string slug, int? groupId)
         {
             if (slug != null)
             {
@@ -38,11 +36,15 @@ namespace socnet.Controllers
             }
             if (groupId.HasValue)
             {
-                return _memberService.GetGroupMembers(groupId.Value, x => x.Profile).Select(x => new Member
+                if (_groupService.GetGroupById(groupId.Value) == null)
+                {
+                    return null;
+                }
+                return _memberService.GetGroupMembers(groupId.Value, x => x.Profile).Select(x => new MemberDTO
                 {
                     GroupId = x.GroupId,
                     MemberId = x.MemberId,
-                    Role = x.Role,
+                    Admin = x.Role == MembershipLevel.Admin,
                     Profile = new Profile
                     {
                         AvatarSrc = x.Profile.AvatarSrc,
@@ -172,34 +174,6 @@ namespace socnet.Controllers
             };
         }
 
-        private int ProfileId
-        {
-            get
-            {
-                try
-                {
-                    return Convert.ToInt32(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "profileId").Value);
-                }
-                catch
-                {
-                    return -1;
-                }
-            }
-        }
-        private bool IsInRole(string roleName)
-        {
-            return User.HasClaim(x => x.Type == ClaimTypes.Role && x.Value == roleName);
-        }
-        private void SetGroupId(string slug, ref int? groupId)
-        {
-            if (slug != null)
-            {
-                var res = _groupService.GetIdBySlug(slug);
-                if (res.HasValue)
-                {
-                    groupId = res.Value;
-                }
-            }
-        }
+        
     }
 }

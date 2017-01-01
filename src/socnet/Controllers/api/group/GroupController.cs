@@ -15,24 +15,10 @@ namespace socnet.Controllers
     [Produces("application/json")]
     [Route("api/Group")]
     [Authorize]
-    public class GroupController : Controller
+    public class GroupController : MyBaseController
     {
         private readonly IGroupService _groupService;
         private IMemberService _memberService;
-        private int ProfileId
-        {
-            get
-            {
-                try
-                {
-                    return Convert.ToInt32(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "profileId").Value);
-                }
-                catch
-                {
-                    return -1;
-                }
-            }
-        }
 
         public GroupController(IGroupService groupService, IMemberService memberService)
         {
@@ -90,7 +76,7 @@ namespace socnet.Controllers
         [HttpGet("{groupId:int}/id")]
         public int? GetId(int groupId)
         {
-            return groupId;
+            return _groupService.GetGroupById(groupId)?.GroupId;
         }
         // POST: api/Group
         [HttpPost]

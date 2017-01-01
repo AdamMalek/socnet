@@ -31,6 +31,11 @@ import { GroupButtonComponent } from './group/group-button/group-button.componen
 import { GroupPostsComponent } from './group/group-posts/group-posts.component';
 import { GroupPostComponent } from './group/group-posts/group-post/group-post.component';
 import { GroupCommentComponent } from './group/group-posts/group-post/group-comment/group-comment.component';
+import { ProfileInfoComponent } from './profile/profile-info/profile-info.component';
+import {WatchingOwnDataGuard} from "./shared/guards/watching-own-data.guard";
+import {MaterialModule} from "@angular/material";
+import {GroupExistsGuard} from "./shared/guards/group-exists.guard";
+import { GroupRequestsComponent } from './group/group-requests/group-requests.component';
 
 @NgModule({
     declarations: [
@@ -50,16 +55,19 @@ import { GroupCommentComponent } from './group/group-posts/group-post/group-comm
         GroupPostsComponent,
         GroupPostComponent,
         GroupCommentComponent,
+        ProfileInfoComponent,
+        GroupRequestsComponent,
     ],
     imports: [
         BrowserModule,
         FormsModule,
         HttpModule,
         RouterModule.forRoot(appRoutes),
+        MaterialModule.forRoot()
     ],
     providers: [ProfileService, ApiHttpService,TokenService,
                 UserDataService, LoggedInGuard, GroupMemberGuard, GroupAdminGuard ,GroupService,
-                NotificationService],
+                NotificationService,WatchingOwnDataGuard, GroupExistsGuard],
     bootstrap: [AppComponent]
 })
 export class AppModule {

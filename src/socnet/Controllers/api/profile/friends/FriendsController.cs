@@ -15,7 +15,7 @@ namespace socnet.Controllers.api.profile.friends
     [Produces("application/json")]
     [Route("api/profile/{profileId:int}/friends")]
     [Authorize]
-    public class FriendsController : Controller
+    public class FriendsController : MyBaseController
     {
         private readonly IProfileService _profileService;
 
@@ -25,21 +25,27 @@ namespace socnet.Controllers.api.profile.friends
         }
         // GET: api/Friends
         [HttpGet]
-        [Authorize(Roles = "Self,Admin,Friend")]
+        [Authorize]
         public IEnumerable<ProfileDTO> Get(int profileId)
         {
+            if (ProfileId != profileId &&
+                !_profileService.AreFriends(profileId, ProfileId) &&
+                !IsInRole("Admin"))
+            {
+                return new List<ProfileDTO>();
+            }
             if (!_profileService.ProfileExists(profileId))
             {
                 Response.StatusCode = 204;
                 return null;
             }
-            var friends = _profileService.GetFriends(profileId).Select(x=> x.ToDto());
+            var friends = _profileService.GetFriends(profileId).Select(x => x.ToDto());
             return friends;
         }
-        
+
         // POST: api/Friends
         [HttpPost]
-        [Authorize(Roles ="Self")]
+        [Authorize(Roles = "Self")]
         public void Post(int profileId, int friendId)
         {
             if (!_profileService.ProfileExists(friendId))
@@ -54,11 +60,11 @@ namespace socnet.Controllers.api.profile.friends
                 return;
             }
         }
-        
-        
+
+
         // DELETE: api/ApiWithActions/5
         [HttpDelete("{friendId:int}")]
-        [Authorize(Roles ="Self")]
+        [Authorize(Roles = "Self")]
         public void Delete(int profileId, int friendId)
         {
             if (_profileService.AreFriends(profileId, friendId))

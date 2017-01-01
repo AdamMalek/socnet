@@ -1,80 +1,28 @@
-<div class="ossn-wall-item" id="activity-item-3">
-    <div class="row">
-        <div class="meta">
-            <img class="user-img" [src]="post.Profile.avatarSrc">
-            <div class="post-menu">
-                <div class="dropdown">
-                    <a id="dLabel" role="button" data-toggle="dropdown" class="btn" data-target="#">
-                        <i class="fa fa-sort-desc"></i>
-                    </a>
-                    <ul class="dropdown-menu multi-level" role="menu" aria-labelledby="dropdownMenu">
-                        <li><a class="post-control-edit ossn-wall-post-edit">Edit</a></li>
-                        <li><a class="post-control-delete ossn-wall-post-delete">Delete</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="user">
-                <a class="owner-link" [routerLink]="'/profile/'+ post.ProfileId">{{ post.Profile.firstName + ' ' +
-                    post.Profile.lastName }}</a>
-            </div>
-            <div class="post-meta">
-                <span class="time-created">2 days ago</span>
+<div class="post md-elevation-z3">
+    <div class="post-header">
+        <div class="col-md-4">
+            <img [src]="post.profile.avatarSrc" class="img-responsive img" style="max-height: 80px;"/>
+        </div>
+        <div class="col-md-8">
+            <h3>{{ post.profile.firstName + ' ' + post.profile.lastName }}</h3>
+        </div>
+    </div>
+    <div class="post-content">
+        <p>{{ post.content }}</p>
+    </div>
+    <div class="post-rating">
+        <span>+</span>
+        <span>{{ post.rating }}</span>
+        <span>-</span>
+    </div>
+    <div class="post-comments row">
+        <div class="col-offset-3">
+            <div class="post-comment" *ngFor="let comment of post.comments">
+                <socnet-group-comment [comment]="comment"></socnet-group-comment>
             </div>
         </div>
-        <div class="post-contents">
-            <p>{{ post.Content }}</p>
-        </div>
-        <div class="comments-likes">
-            <div class="menu-likes-comments-share">
-                <li><a class="post-control-comment comment-post">Comment</a></li>
-                <li><a class="post-control-like">+</a></li>
-                <li><a class="post-control-like">{{ post.Rating }}</a></li>
-                <li><a class="post-control-like">-</a></li>
-            </div>
-            <div class="comments-list">
-                <div class="ossn-comments-list-3">
-                    <div *ngFor="let comment of post.Comments">
-                        <socnet-group-comment [comment]="comment"></socnet-group-comment>
-                    </div>
-                </div>
-                <div class="comments-item">
-                    <div class="row">
-                        <div class="col-md-1">
-                            <img class="comment-user-img"
-                                 src="http://test.dev/avatar/admin/smaller/a46f241d979f497ac091b39792f2c55b.jpeg">
-                        </div>
-                        <div class="col-md-11">
-                            <form action="http://test.dev/action/post/comment" id="comment-container-3"
-                                  class="ossn-form comment-container" autocomplete="off" method="post"
-                                  enctype="multipart/form-data">
-                                <fieldset><input type="hidden" name="ossn_ts" value="1483223623">
-                                    <input type="hidden" name="ossn_token" value="22039f8edf6a0d10a794dc4fb8b27cba">
-                                    <div class="ossn-comment-attach-photo"
-                                         onclick="Ossn.Clk('#ossn-comment-image-file-3');"><i class="fa fa-camera"></i>
-                                    </div>
-                                    <span type="text" name="comment" id="comment-box-3" class="comment-box"
-                                          placeholder="Write a comment..." contenteditable="true"></span>
-                                    <input type="hidden" name="post" value="3">
-                                    <input type="hidden" name="comment-attachment">
-
-
-                                </fieldset>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                <script>  Ossn.PostComment(3); </script>
-                <div class="ossn-comment-attachment" id="comment-attachment-container-3">
-                    <script>Ossn.CommentImage(3);</script>
-                    <form id="ossn-comment-attachment-3" class="ossn-form" method="post" enctype="multipart/form-data">
-                        <fieldset><input type="hidden" name="ossn_ts" value="1483223623">
-                            <input type="hidden" name="ossn_token" value="22039f8edf6a0d10a794dc4fb8b27cba"> <input
-                                type="file" name="file" style="display:none;" id="ossn-comment-image-file-3">
-                            <div class="image-data"></div>
-                        </fieldset>
-                    </form>
-                </div>
-            </div>
-        </div>
+    </div>
+    <div class="post-new-comment" style="border-bottom: 1px solid black">
+        new comment bar
     </div>
 </div>
