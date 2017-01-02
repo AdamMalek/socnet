@@ -47,7 +47,7 @@ namespace socnet.Controllers
                 };
             }
         }
-        
+
         [HttpGet("{slug}", Name = "GetSlug")]
         public GroupDTO Get(string slug)
         {
@@ -97,11 +97,58 @@ namespace socnet.Controllers
         }
 
         // PUT: api/Group/5
-        [HttpPut("{id}")]
+        [HttpPut("{groupId:int}")]
         [Authorize(Roles = "GroupAdmin")]
-        public void Put(int id, string slug)
+        public object Put(int groupId, GroupDTO data)
         {
-            Response.WriteAsync(_groupService.SetSlug(id, slug).ToString());
+            if (data == null)
+            {
+                Response.StatusCode = 400;
+                return new
+                {
+                    success = false,
+                    message = "Bad Request (empty data)"
+                };
+            }
+            var group = _groupService.GetGroupById(groupId);
+            if (group == null)
+            {
+                Response.StatusCode = 204;
+                return new
+                {
+                    success = false,
+                    message = "No group with given id"
+                };
+            }
+            try
+            {
+                if (data.GroupName != null && group.GroupName != data.GroupName)
+                {
+                    _groupService.SetName(group.GroupId, data.GroupName);
+                }
+                if (data.GroupSlug != null && group.GroupSlug != data.GroupSlug)
+                {
+                    _groupService.SetSlug(group.GroupId, data.GroupSlug);
+                }
+                if (data.Description != null && group.Description != data.Description)
+                {
+                    _groupService.SetDescription(group.GroupId, data.Description);
+                }
+                return new
+                {
+                    success = true,
+                    message = "OK"
+                };
+            }
+            catch (Exception e)
+            {
+                Response.StatusCode = 500;
+                return new
+                {
+                    success = false,
+                    message = e.Message
+                };
+            }
         }
 
         // DELETE: api/ApiWithActions/5

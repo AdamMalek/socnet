@@ -15,28 +15,10 @@ namespace socnet.Controllers.api.group.request
     [Route("api/group/{groupId:int}/request")]
     [Route("api/group/{slug}/request")]
     [Produces("application/json")]
-    public class RequestMembershipController : Controller
+    public class RequestMembershipController : GroupBaseController
     {
-        private readonly IGroupService _groupService;
-
-        private int ProfileId
+        public RequestMembershipController(IGroupService groupService):base(groupService)
         {
-            get
-            {
-                try
-                {
-                    return Convert.ToInt32(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "profileId").Value);
-                }
-                catch
-                {
-                    return -1;
-                }
-            }
-        }
-
-        public RequestMembershipController(IGroupService groupService)
-        {
-            _groupService = groupService;
         }
 
         [HttpGet("{profileId:int}")]
@@ -181,21 +163,38 @@ namespace socnet.Controllers.api.group.request
             }
         }
 
-        private void SetGroupId(string slug, ref int? groupId)
+        [HttpDelete("cancel")]
+        [Authorize]
+        public object CancelRequest(string slug,int? groupId)
         {
-            if (slug != null)
+            SetGroupId(slug, ref groupId);
+            if (!groupId.HasValue)
             {
-                var res = _groupService.GetIdBySlug(slug);
-                if (res.HasValue)
+                Response.StatusCode = 400;
+                return new
                 {
-                    groupId = res.Value;
-                }
+                    success = false,
+                    message = "Group doesn't exist."
+                };
             }
-        }
-
-        private bool IsInRole(string roleName)
-        {
-            return User.HasClaim(x => x.Type == ClaimTypes.Role && x.Value == roleName);
+            try
+            {
+                _groupService.CancelRequest(groupId.Value, ProfileId);
+                return new
+                {
+                    success = true,
+                    message = "OK"
+                };
+            }
+            catch (Exception e)
+            {
+                Response.StatusCode = 400;
+                return new
+                {
+                    success = false,
+                    message = e.Message
+                };
+            }
         }
     }
 }

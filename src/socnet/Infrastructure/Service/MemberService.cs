@@ -23,7 +23,7 @@ namespace socnet.Infrastructure.Service
             _profileRepository = profileRepository;
         }
 
-        public bool CreateMember(int groupId, int profileId, MembershipLevel role)
+        public void CreateMember(int groupId, int profileId, MembershipLevel role)
         {
             var group = _groupRepository.GetById(groupId);
             if (group == null) throw new ArgumentException("Group doesn't exist!");
@@ -40,7 +40,6 @@ namespace socnet.Infrastructure.Service
             try
             {
                 _memberRepository.CreateMember(newMember);
-                return true;
             }
             catch (Exception e)
             {
@@ -78,23 +77,35 @@ namespace socnet.Infrastructure.Service
             return GetMembership(groupId, profileId) != null;
         }
 
-        public bool RemoveMember(int membershipId)
+        public void RemoveMember(int membershipId)
         {
             var membership = GetMembership(membershipId);
-            if (membership == null) return false;
-            _memberRepository.DeleteMember(membership);
-            return true;
+            if (membership == null) throw new ArgumentException("Invalid membership id");
+            try
+            {
+                _memberRepository.DeleteMember(membership);
+            }
+            catch
+            {
+                throw new ArgumentException("Database error");
+            }
         }
 
-        public bool RemoveMember(int groupId, int profileId)
+        public void RemoveMember(int groupId, int profileId)
         {
             var membership = GetMembership(groupId, profileId);
-            if (membership == null) return false;
+            if (membership == null) throw new ArgumentException("Invalid membership id");
 
             if (membership.Role == MembershipLevel.Admin
-                && _memberRepository.GetMembersWhere(x => x.GroupId == groupId && x.Role == MembershipLevel.Admin).Count() == 1) return false;
-
-            return _memberRepository.DeleteMember(membership);
+                && _memberRepository.GetMembersWhere(x => x.GroupId == groupId && x.Role == MembershipLevel.Admin).Count() == 1) throw new ArgumentException("Cannot remove last administrator from group.");
+            try
+            {
+                _memberRepository.DeleteMember(membership);
+            }
+            catch
+            {
+                throw new ArgumentException("Database error.");
+            }
         }
 
 
@@ -102,28 +113,35 @@ namespace socnet.Infrastructure.Service
         {
             return _memberRepository.GetMembersWhere(x => x.GroupId == groupId, includes);
         }
-        public bool SetRole(int membershipId, MembershipLevel newRole)
+        public void SetRole(int membershipId, MembershipLevel newRole)
         {
             var membership = GetMembership(membershipId);
-            return SetRole(membership, newRole);
+            SetRole(membership, newRole);
         }
 
-        public bool SetRole(int profileId, int groupId, MembershipLevel newRole)
+        public void SetRole(int profileId, int groupId, MembershipLevel newRole)
         {
             var membership = GetMembership(groupId, profileId);
-            return SetRole(membership, newRole);
+            SetRole(membership, newRole);
         }
 
-        private bool SetRole(Member member, MembershipLevel newRole)
+        private void SetRole(Member member, MembershipLevel newRole)
         {
-            if (member == null) return false;
+            if (member == null) throw new ArgumentException("Invalid member");
             if (newRole == MembershipLevel.User)
             {
                 var admins = _memberRepository.GetMembersWhere(x => x.Role == MembershipLevel.Admin && x.GroupId == member.GroupId);
-                if (admins.Count() == 1 && admins.First().ProfileId == member.ProfileId) return false;
+                if (admins.Count() == 1 && admins.First().ProfileId == member.ProfileId) throw new ArgumentException("Cannot remove admin rights from only admin in group.");
             }
             member.Role = newRole;
-            return _memberRepository.UpdateMember(member);
+            try
+            {
+                _memberRepository.UpdateMember(member);
+            }
+            catch
+            {
+                throw new ArgumentException("Database error");
+            }
         }
     }
 }

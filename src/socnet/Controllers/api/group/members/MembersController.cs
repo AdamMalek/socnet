@@ -21,7 +21,7 @@ namespace socnet.Controllers
         private readonly IMemberService _memberService;
         private readonly IProfileService _profileService;
 
-        public MembersController(IMemberService memberService, IGroupService groupService, IProfileService profileService):base(groupService)
+        public MembersController(IMemberService memberService, IGroupService groupService, IProfileService profileService) : base(groupService)
         {
             _memberService = memberService;
             _profileService = profileService;
@@ -73,107 +73,137 @@ namespace socnet.Controllers
         // POST: api/Members
         [HttpPost]
         [Authorize(Roles = "GroupAdmin")]
-        public void Post(string slug, int? groupId, AddMemberDTO member)
+        public object Post(string slug, int? groupId, AddMemberDTO member)
         {
             SetGroupId(slug, ref groupId);
             if (!groupId.HasValue)
             {
                 Response.StatusCode = 404;
-                Response.WriteAsync("No group");
-                return;
+                return new
+                {
+                    success = false,
+                    message = "No group"
+                };
             }
             member.GroupId = groupId.Value;
             if (_profileService.ProfileExists(member.ProfileId) && !_memberService.IsMember(member.ProfileId, member.GroupId))
             {
-                var result = _memberService.CreateMember(member.GroupId, member.ProfileId, member.Role);
-                if (result)
+                try
                 {
+                    _memberService.CreateMember(member.GroupId, member.ProfileId, member.Role);
                     Response.StatusCode = 200;
-                    Response.WriteAsync("OK");
+                    return new
+                    {
+                        success = true,
+                        message = "OK"
+                    };
                 }
-                else
+                catch (Exception e)
                 {
                     Response.StatusCode = 500;
-                    Response.WriteAsync("Internal error");
+                    return new
+                    {
+                        success = false,
+                        message = e.Message
+                    };
                 }
             }
             else
             {
-                Response.StatusCode = 500;
-                Response.WriteAsync("Data incorrect");
+                Response.StatusCode = 400;
+                return new
+                {
+                    success = false,
+                    message = "Profile doesn't exist or is already a member"
+                };
             }
         }
 
         // PUT: api/Members/5
         [HttpPut("{profileId:int}")]
         [Authorize(Roles = "GroupAdmin")]
-        public void Put(string slug, int? groupId, int profileId, string newRole)
+        public object Put(string slug, int? groupId, int profileId, string newRole)
         {
             SetGroupId(slug, ref groupId);
-            if (!groupId.HasValue ||
-                !_memberService.IsMember(profileId, groupId.Value) ||
-                !_profileService.ProfileExists(profileId))
+
+            if (!_memberService.IsMember(profileId, groupId.Value))
             {
-                Response.StatusCode = 404;
-                Response.WriteAsync("No group");
+                Response.StatusCode = 400;
+                return new
+                {
+                    success = false,
+                    message = "Given user is not a member"
+                };
             }
+
             var role = newRole.ToLower() == "admin" ? MembershipLevel.Admin : MembershipLevel.User;
-            var result = _memberService.SetRole(profileId, groupId.Value, role);
-            if (result)
+            try
             {
+                _memberService.SetRole(profileId, groupId.Value, role);
                 Response.StatusCode = 200;
-                Response.WriteAsync("Ok");
+                return new
+                {
+                    success = true,
+                    message = "OK"
+                };
             }
-            else
+            catch (Exception e)
             {
                 Response.StatusCode = 500;
-                Response.WriteAsync("Internal error");
+                return new
+                {
+                    success = false,
+                    message = e.Message
+                };
             }
         }
 
         // DELETE: api/ApiWithActions/5
         [HttpDelete("{profileId:int}")]
-        [Authorize]
+        [Authorize(Roles ="GroupMember")]
         public object Delete(string slug, int? groupId, int profileId)
         {
             SetGroupId(slug, ref groupId);
-            if (!groupId.HasValue ||
-                !_memberService.IsMember(profileId, groupId.Value))
-            {
-                Response.StatusCode = 404;
-                return new
-                {
-                    status = "No group or member",
-                    deleted = false
-                };
-            }
+            //if (!groupId.HasValue ||
+            //    !_memberService.IsMember(profileId, groupId.Value))
+            //{
+            //    Response.StatusCode = 404;
+            //    return new
+            //    {
+            //        message = "No group or member",
+            //        success = false
+            //    };
+            //}
             if (profileId != ProfileId && !IsInRole("GroupAdmin"))
             {
                 Response.StatusCode = 403;
                 return new
                 {
-                    status = "Forbidden",
-                    deleted = false
+                    message = "Forbidden",
+                    success = false
                 };
             }
-            var result = _memberService.RemoveMember(groupId.Value, profileId);
-            if (!result)
+            try
+            {
+                _memberService.RemoveMember(groupId.Value, profileId);
+                Response.StatusCode = 200;
+                return new
+                {
+                    message = "OK",
+                    success = true
+                };
+            }
+            catch (Exception e)
             {
                 Response.StatusCode = 400;
                 return new
                 {
-                    status = "Error",
-                    deleted = false
+                    message = e.Message,
+                    success = false
                 };
             }
-            Response.StatusCode = 200;
-            return new
-            {
-                status = "OK",
-                deleted = true
-            };
         }
 
-        
+
     }
 }

@@ -41,9 +41,9 @@ namespace socnet.Controllers
             //    LastName = "test",
             //    University = "xd"
             //});
-            Expression<Func<User,object>> ss = x => x.Profile;
-             var user = _userService.GetUserByEmail(email,ss);
-            
+            Expression<Func<User, object>> ss = x => x.Profile;
+            var user = _userService.GetUserByEmail(email, ss);
+
             //var user2 = _userService.LoginUser("test user", "hasslo16");
             //if (user2 != null)
             //{
@@ -55,12 +55,12 @@ namespace socnet.Controllers
             //users[0].Profile.Friends.Add(new Relation {FriendId = users[1].ProfileId});
             //users[1].Profile.Friends.Add(new Relation {FriendId = users[0].ProfileId});
             //_db.SaveChanges();
-            return View("Index",user);
+            return View("Index", user);
         }
 
         public IActionResult Index(int id)
         {
-            var user = _userService.GetUserById(id,x=> x.Profile, x=> x.Profile.Friends);
+            var user = _userService.GetUserById(id, x => x.Profile, x => x.Profile.Friends);
             return View(user);
         }
         public IActionResult Login(string login, string pass)
@@ -90,7 +90,7 @@ namespace socnet.Controllers
             //users[0].Profile.Friends.Add(new Relation {FriendId = users[1].ProfileId});
             //users[1].Profile.Friends.Add(new Relation {FriendId = users[0].ProfileId});
             //_db.SaveChanges();
-            return View("Index",user);
+            return View("Index", user);
         }
 
         [Authorize]
@@ -105,44 +105,54 @@ namespace socnet.Controllers
         {
             return View(new RegisterViewModel());
         }
-        [HttpPost]
+        [HttpPost("api/register")]
         [AllowAnonymous]
-        public async Task<ActionResult> Register( RegisterViewModel vm,string returnUrl = null)
+        public object Register(RegisterViewModel vm, string returnUrl = null)
         {
             if (ModelState.IsValid)
             {
-                var user = _userService.GetUserByUserName(vm.Username) ?? _userService.GetUserByEmail(vm.Email);
-                if (user != null)
+                if (_userService.GetUserByUserName(vm.Username) != null)
                 {
-                    ModelState.AddModelError("Username", "Username is taken");
-                    return View(vm);
+                    ModelState.AddModelError("username", "Username is taken");
                 }
-                ProfileDTO p = new ProfileDTO
+                if (_userService.GetUserByEmail(vm.Email) != null)
                 {
-                    Email = vm.Email,
-                    FirstName = vm.FirstName,
-                    LastName = vm.LastName,
-                    University = vm.University
-                };
-                _userService.RegisterUser(vm.Username, vm.Password, p);
-
-                HttpWebRequest req = (HttpWebRequest)WebRequest.Create("http://localhost:41940/login");
-                req.Method = "POST";
-                req.ContentType = "application/x-www-form-urlencoded";
-                req.Accept = "application/json";
-
-                string postData = "username=" + vm.Username + "&password=" + vm.Password;
-                byte[] byte1 = Encoding.ASCII.GetBytes(postData);
-
-                Stream newStream = await req.GetRequestStreamAsync();
-                newStream.Write(byte1, 0, byte1.Length);
-
-                var res = await req.GetResponseAsync();
-
-                return Json(res);
-                //return RedirectToAction("Index");
+                    ModelState.AddModelError("email", "Email is taken");
+                }
+                if (ModelState.ErrorCount == 0)
+                {
+                    ProfileDTO p = new ProfileDTO
+                    {
+                        Email = vm.Email,
+                        FirstName = vm.FirstName,
+                        LastName = vm.LastName,
+                        University = vm.University
+                    };
+                    var usr = _userService.RegisterUser(vm.Username, vm.Password, p);
+                    if (usr != null)
+                    {
+                        return new
+                        {
+                            success = true
+                        };
+                    }
+                    else
+                    {
+                        return new
+                        {
+                            success = false,
+                            status = "Database error"
+                        };
+                    }
+                }
             }
-            return View(vm);
+            var errors = ModelState.Select(x => new { key = x.Key, value = x.Value }).ToDictionary(x => x.key, x => x.value);
+            return new
+            {
+                success = false,
+                status = "model errors",
+                errors = errors
+            };
         }
 
         public bool AddRole(string username, string role)

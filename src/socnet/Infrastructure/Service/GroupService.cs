@@ -169,41 +169,47 @@ namespace socnet.Infrastructure.Service
             return memberships.Select(x => x.Group).AsEnumerable();
         }
 
-        public bool SetName(string slug, string newName)
+        public void SetName(string slug, string newName)
         {
             var group = GetGroupBySlug(slug, "members");
-            return SetName(group, newName);
+            SetName(group, newName);
         }
 
-        public bool SetName(int groupId, string newName)
+        public void SetName(int groupId, string newName)
         {
             var group = GetGroupById(groupId, "member");
-            return SetName(group, newName);
+            SetName(group, newName);
         }
 
-        bool SetName(Group group, string newName)
+        void SetName(Group group, string newName)
         {
             newName = sanitizeInput(newName);
-            if (group == null || string.IsNullOrWhiteSpace(newName)) return false;
+            if (group == null) throw new ArgumentException("Group doesn't exist");
+            if (string.IsNullOrWhiteSpace(newName)) throw new ArgumentException("Name cannot be empty");
             group.GroupName = newName;
             _groupRepository.UpdateGroup(group);
-            return true;
         }
 
-        public bool SetSlug(int groupId, string slug = "")
+        public void SetSlug(int groupId, string slug = "")
         {
             slug = sanitizeInput(slug).Replace(" ", "-").Replace(".", "").Replace(",", "");
 
-            if (string.IsNullOrWhiteSpace(slug)) return false;
-            if (slug[0] >= '0' && slug[0] <= '9') return false;
+            if (string.IsNullOrWhiteSpace(slug)) throw new ArgumentException("Slug cannot be empty");
+            if (slug[0] >= '0' && slug[0] <= '9') throw new ArgumentException("Slug cannot start with number");
             var newSlugGroup = GetGroupBySlug(slug);
-            if (newSlugGroup != null) return false;
+            if (newSlugGroup != null) throw new ArgumentException("Slug in use");
             var group = GetGroupById(groupId);
-            if (group == null) return false;
+            if (group == null) throw new ArgumentException("Group doesn't exist");
 
             group.GroupSlug = slug;
-            _groupRepository.UpdateGroup(group);
-            return true;
+            try
+            {
+                _groupRepository.UpdateGroup(group);
+            }
+            catch
+            {
+                throw new ArgumentException("Database error!");
+            }
         }
 
         public IEnumerable<Post> GetPosts(int groupId, int count, int skip, Expression<Func<Post, object>> orderBy,
@@ -307,6 +313,48 @@ namespace socnet.Infrastructure.Service
         public int? GetIdBySlug(string slug)
         {
             return _groupRepository.GetBySlug(slug)?.GroupId;
+        }
+
+        public void SetDescription(string slug, string description)
+        {
+            var group = GetGroupBySlug(slug);
+            SetDescription(group, description);
+        }
+
+        public void SetDescription(int groupId, string description)
+        {
+            var group = GetGroupById(groupId);
+            SetDescription(group, description);
+        }
+
+        void SetDescription(Group group, string description)
+        {
+            description = sanitizeInput(description);
+            if (group == null) throw new ArgumentException("Group doesn't exist");
+            group.Description = description;
+            try
+            {
+                _groupRepository.UpdateGroup(group);
+            }
+            catch
+            {
+                throw new ArgumentException("Database error!");
+            }
+        }
+
+        public void CancelRequest(int groupId, int profileId)
+        {
+            var request = _groupRepository.GetRequestsWhere(x => x.ProfileId == profileId &&
+                                                            x.GroupId == groupId).FirstOrDefault();
+            if (request == null) throw new ArgumentException("No request from given profile");
+            try
+            {
+                DeclineRequest(request.RequestId);
+            }
+            catch (Exception e)
+            {
+                throw new ArgumentException(e.Message);
+            }
         }
     }
 }

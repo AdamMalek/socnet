@@ -13,6 +13,7 @@ namespace socnet.Infrastructure.Service.Interfaces
         void SendRequest(int groupId, int profileId);
         void AcceptRequest(string requestId);
         void DeclineRequest(string requestId);
+        void CancelRequest(int groupId, int profileId);
 
         Group GetGroupById(int id,string[] scope = null);
         int? GetIdBySlug(string slug);
@@ -21,9 +22,11 @@ namespace socnet.Infrastructure.Service.Interfaces
 
         Group CreateGroup(string name, int ownerId, string slug = null);
 
-        bool SetSlug(int groupId, string slug);
-        bool SetName(int groupId, string newName);
-        bool SetName(string slug, string newName);
+        void SetSlug(int groupId, string slug);
+        void SetName(int groupId, string newName);
+        void SetName(string slug, string newName);
+        void SetDescription(string slug, string description);
+        void SetDescription(int groupId, string description);
 
         IEnumerable<Profile> GetMembers(int id);
         IEnumerable<Profile> GetMembers(string slug);
