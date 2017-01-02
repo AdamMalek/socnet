@@ -16,6 +16,7 @@ export class GroupButtonComponent implements OnInit {
     @Input() ready;
     @Output() requestMembership = new EventEmitter();
     @Output() leaveGroup = new EventEmitter();
+    @Output() cancelMembershipRequest = new EventEmitter();
 
     hasSentRequest(){
         return (this.isMember == EGroupStatus.RequestSent);
@@ -37,8 +38,11 @@ export class GroupButtonComponent implements OnInit {
             if (this.isGroupMember()) {
                 this.leaveGroup.emit();
             }
-            else if (!this.isGroupMember()){
+            else if (!this.isGroupMember() && !this.hasSentRequest()){
                 this.requestMembership.emit();
+            }
+            else if (!this.isGroupMember() && this.hasSentRequest()){
+                this.cancelMembershipRequest.emit();
             }
         }
     }

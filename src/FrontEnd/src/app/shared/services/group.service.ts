@@ -5,6 +5,7 @@ import {Observable} from "rxjs";
 import {resolveAvatarPath} from "./helpers";
 import {IGroupPost} from "../../group/group-posts/models/group-post.model";
 import {IGroupMember} from "../../group/group-members/models/group-member.model";
+import {IRequestResult} from "../models/request-result.model";
 
 @Injectable()
 export class GroupService {
@@ -14,14 +15,14 @@ export class GroupService {
 
     getMembers(groupId): Observable<IGroupMember[]> {
         return this.apiHttp.get('/api/group/' + groupId + '/members').map(response => {
-            if (response.status == 200){
+            if (response.status == 200) {
                 return <IGroupMember[]>response.json();
             }
             else {
                 return [];
             }
-        }).map(x=>{
-            for (let member of x){
+        }).map(x => {
+            for (let member of x) {
                 member.profile.avatarSrc = resolveAvatarPath(member.profile.avatarSrc);
             }
             return x;
@@ -40,8 +41,12 @@ export class GroupService {
         return this.apiHttp.get('/api/group/' + groupId).map(x => x.json());
     }
 
-    leaveGroup(groupId) {
+    leaveGroup(groupId): Observable<IRequestResult> {
         return this.apiHttp.delete('/api/group/' + groupId + '/members/' + this.userDataService.getClaim("userId")).map(x => x.json());
+    }
+
+    cancelGroupRequest(groupId): Observable<IRequestResult>{
+        return this.apiHttp.delete('/api/group/' + groupId + '/request/cancel').map(x => x.json());
     }
 
     isMember(groupId): Observable<boolean> {
@@ -76,13 +81,19 @@ export class GroupService {
         });
     }
 
-    isAdmin(groupId: number): Observable<boolean> {
-        return this.apiHttp.get('/api/group/' + groupId + '/id/').map(x => {
-            let res = x.json();
-            if (res == null) return false;
-            let userGroups = this.userDataService.getClaim('admin');
-            if (userGroups == null) return false;
-            return [].concat(userGroups).indexOf(res) >= 0;
-        });
+    isAdmin(slug): Observable<boolean> {
+        let id: number = +slug;
+        //if (!isNaN(id)) {
+            // TODO local check from token
+        //}
+        //else {
+            return this.apiHttp.get('/api/group/' + slug + '/id/').map(x => {
+                let res = x.json();
+                if (res == null) return false;
+                let userGroups = this.userDataService.getClaim('admin');
+                if (userGroups == null) return false;
+                return [].concat(userGroups).indexOf(res) >= 0;
+            });
+        //}
     }
 }

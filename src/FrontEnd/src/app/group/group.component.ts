@@ -1,9 +1,10 @@
 import {Component, OnInit, OnDestroy} from '@angular/core';
 import {ActivatedRoute} from "@angular/router";
 import {GroupService} from "../shared/services/group.service";
-import {Subscription, Subscriber} from "rxjs";
+import {Subscription} from "rxjs";
 import {EGroupStatus} from "./group-status.enum";
 import {UserDataService} from "../shared/services/user-data.service";
+import {NotificationService} from "../shared/services/notification.service";
 
 @Component({
     selector: 'socnet-group',
@@ -12,7 +13,8 @@ import {UserDataService} from "../shared/services/user-data.service";
 })
 export class GroupComponent implements OnInit,OnDestroy {
 
-    constructor(private route: ActivatedRoute, private groupService: GroupService,private userService:UserDataService) {
+    constructor(private route: ActivatedRoute, private groupService: GroupService,
+                private userService:UserDataService, private notificationService:NotificationService) {
     }
     sub: Subscription;
     isMember = EGroupStatus.NotMember;
@@ -42,11 +44,13 @@ export class GroupComponent implements OnInit,OnDestroy {
                     this.groupService.isMember(this.groupId).subscribe(res => {
                         if (res) {
                             this.groupService.isAdmin(this.groupId).subscribe(res=>{
+                                console.log(res);
                                 this.isAdmin = res;
                             });
                             this.isMember = EGroupStatus.Member;
                         }
                         else{
+                            this.isAdmin = false;
                             this.groupService.hasSentMembershipRequest(this.groupId).subscribe(res=>{
                                 if (res.hasSent === true){
                                     this.isMember = EGroupStatus.RequestSent;
@@ -83,16 +87,32 @@ export class GroupComponent implements OnInit,OnDestroy {
         return 'group/'+this.groupId+'/';
     }
 
+    cancelRequest(){
+        if (this.groupId != -1){
+            this.ready = false;
+            this.groupService.cancelGroupRequest(this.groupId).subscribe(res=>{
+                if (res.success){
+                    this.isMember = EGroupStatus.NotMember;
+                    this.ready = true;
+                }
+            },err=>{
+                this.notificationService.showErrorInformation(err.message);
+                this.ready = true;
+            });
+        }
+    }
+
     leaveGroup(){
         if (this.groupId != -1){
             this.ready = false;
             this.groupService.leaveGroup(this.groupId).subscribe(res=>{
-                if (res.deleted){
+                if (res.success){
                     this.isMember = EGroupStatus.NotMember;
                     this.userService.refreshToken();
                     this.ready = true;
                 }
             },err=>{
+                this.notificationService.showErrorInformation(err.json().message);
                 this.ready = true;
             });
         }

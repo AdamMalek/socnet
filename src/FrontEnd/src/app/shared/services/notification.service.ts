@@ -1,16 +1,18 @@
 import {Injectable} from '@angular/core';
+import {IAlertify} from "../models/alertify.interface";
 
 declare var alertify;
 
 @Injectable()
 export class NotificationService {
 
-    _notificationService = alertify;
+    _notificationService:IAlertify = alertify;
 
-    constructor() {}
+    constructor() {
+    }
 
     showInformation(message:string, fullscreen:boolean=false){
-
+        this._notificationService.log(message);
     }
 
     showSuccessInformation(message:string, fullscreen:boolean=false){
@@ -18,6 +20,6 @@ export class NotificationService {
     }
 
     showErrorInformation(message:string, fullscreen:boolean=false){
-
+        this._notificationService.error(message);
     }
 }

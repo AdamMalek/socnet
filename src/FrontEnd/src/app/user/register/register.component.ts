@@ -30,17 +30,14 @@ export class RegisterComponent implements OnInit {
         let data = new RegisterData(form.username,form.email,form.password,form.confirmPassword,form.firstName,form.lastName,form.university);
         this.errors = data.checkForValidationErrors();
         if (this.errors.count == 0) {
-            this.userService.registerUser(data).catch(res=> {
-                res = res as Response;
-                if (res.status = 400){
-                    console.log(res.json());
-                }
-                return Observable.throw(res);
-            }).map(x=> x.json()).subscribe(res=>{
-                if (res.status == "ok"){
+            this.userService.registerUser(data).map(x=> x.json()).subscribe(res=>{
+                if (res.success == true){
                     this.userService.logIn(data.username,data.password);
                 }
-            })
+            },err=>{
+                console.log("register error");
+                console.log(err);
+            });
         }
     }
 

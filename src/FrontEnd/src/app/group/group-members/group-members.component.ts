@@ -3,6 +3,7 @@ import {ActivatedRoute} from "@angular/router";
 import {GroupService} from "../../shared/services/group.service";
 import {UserData} from "../../shared/models/user-data";
 import {IGroupMember} from "./models/group-member.model";
+import {NotificationService} from "../../shared/services/notification.service";
 
 @Component({
     selector: 'socnet-group-members',
@@ -10,7 +11,7 @@ import {IGroupMember} from "./models/group-member.model";
     styleUrls: ['./group-members.component.css']
 })
 export class GroupMembersComponent implements OnInit, OnDestroy {
-    constructor(private route: ActivatedRoute, private groupService: GroupService) {
+    constructor(private route: ActivatedRoute, private groupService: GroupService,private notificationService: NotificationService) {
     }
 
     members:IGroupMember[]=[];
@@ -21,6 +22,7 @@ export class GroupMembersComponent implements OnInit, OnDestroy {
     loading = true;
 
     ngOnInit() {
+        this.notificationService.showInformation("XD");
         this.groupIdSub = this.route.parent.params.subscribe(params=>{
             this.groupId = params["groupId"];
             this.loading = true;

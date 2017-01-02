@@ -3,7 +3,8 @@
     <p class="lead">{{ groupDescription }}</p>
     <socnet-group-button [ready]="ready" [isMember]="isMember" [groupExists]="groupExists"
                          (requestMembership)="sendMembershipRequest();"
-                         (leaveGroup)="leaveGroup();"></socnet-group-button>
+                         (leaveGroup)="leaveGroup();"
+                         (cancelMembershipRequest)="cancelRequest();"></socnet-group-button>
 </div>
 <div class="row">
     <nav class="navbar navbar-default col-sm-12">
@@ -22,8 +23,10 @@
                 <ul class="nav navbar-nav">
                     <li routerLinkActive="active"><a [routerLink]="'/group/'+groupId+'/posts'">Posts</a></li>
                     <li routerLinkActive="active"><a [routerLink]="'/group/'+groupId+'/members'">Members</a></li>
-                    <li routerLinkActive="active" *ngIf="isAdmin"><a [routerLink]="'/group/'+groupId+'/requests'">Requests</a></li>
-                    <li routerLinkActive="active" *ngIf="isAdmin"><a [routerLink]="'/group/'+groupId+'/settings'">Settings</a></li>
+                    <li routerLinkActive="active" *ngIf="isAdmin"><a [routerLink]="'/group/'+groupId+'/requests'">Requests</a>
+                    </li>
+                    <li routerLinkActive="active" *ngIf="isAdmin"><a [routerLink]="'/group/'+groupId+'/settings'">Settings</a>
+                    </li>
                 </ul>
             </div>
         </div>

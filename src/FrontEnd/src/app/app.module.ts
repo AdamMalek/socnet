@@ -63,7 +63,7 @@ import { GroupRequestsComponent } from './group/group-requests/group-requests.co
         FormsModule,
         HttpModule,
         RouterModule.forRoot(appRoutes),
-        MaterialModule.forRoot()
+        MaterialModule.forRoot(),
     ],
     providers: [ProfileService, ApiHttpService,TokenService,
                 UserDataService, LoggedInGuard, GroupMemberGuard, GroupAdminGuard ,GroupService,
