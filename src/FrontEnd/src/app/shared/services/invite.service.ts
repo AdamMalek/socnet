@@ -2,11 +2,12 @@ import {Injectable, EventEmitter} from '@angular/core';
 import {ApiHttpService} from "./api-http.service";
 import {resolveAvatarPath} from "./helpers";
 import {Observable} from "rxjs";
+import {UserDataService} from "./user-data.service";
 
 @Injectable()
 export class InviteService {
 
-    constructor(private apiHttpService:ApiHttpService) {
+    constructor(private apiHttpService:ApiHttpService,private userData:UserDataService) {
     }
     getProfileInvites(profileId: number) {
         let url = "/api/profile/" + profileId.toString() + "/invites";
@@ -17,6 +18,12 @@ export class InviteService {
             }
             return x;
         })
+    }
+
+    receivedInvite(friendId){
+        return this.getProfileInvites(this.userData.getClaim("profileId")).map(x=> x.json()).subscribe(res=>{
+            return res.filter(x=> x.friend.profileId == friendId).length > 0;
+        });
     }
 
     acceptInvite(profileId:number, inviteId:string): Observable<boolean>{

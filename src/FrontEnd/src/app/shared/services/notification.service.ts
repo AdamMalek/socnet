@@ -16,7 +16,7 @@ export class NotificationService {
     }
 
     showSuccessInformation(message:string, fullscreen:boolean=false){
-
+        this._notificationService.success(message);
     }
 
     showErrorInformation(message:string, fullscreen:boolean=false){

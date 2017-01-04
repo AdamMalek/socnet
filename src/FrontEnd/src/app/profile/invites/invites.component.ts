@@ -3,6 +3,7 @@ import {Invite} from "../../shared/models/invite";
 import {ActivatedRoute} from "@angular/router";
 import {ProfileService} from "../../shared/services/profile.service";
 import {InviteService} from "../../shared/services/invite.service";
+import {NotificationService} from "../../shared/services/notification.service";
 
 @Component({
     selector: 'socnet-invites',
@@ -12,7 +13,7 @@ import {InviteService} from "../../shared/services/invite.service";
 export class InvitesComponent implements OnInit, OnDestroy {
 
 
-    constructor(private route: ActivatedRoute,private inviteService:InviteService) {
+    constructor(private route: ActivatedRoute,private inviteService:InviteService,private notificationService: NotificationService) {
     }
 
     profileId;
@@ -29,7 +30,7 @@ export class InvitesComponent implements OnInit, OnDestroy {
                     this.invites = invites;
                 }
             },err=>{
-                console.log(err);
+                this.notificationService.showErrorInformation("Cannot get profile invites");
             });
         });
     }

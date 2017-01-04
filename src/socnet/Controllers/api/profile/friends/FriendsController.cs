@@ -28,12 +28,6 @@ namespace socnet.Controllers.api.profile.friends
         [Authorize]
         public IEnumerable<ProfileDTO> Get(int profileId)
         {
-            if (ProfileId != profileId &&
-                !_profileService.AreFriends(profileId, ProfileId) &&
-                !IsInRole("Admin"))
-            {
-                return new List<ProfileDTO>();
-            }
             if (!_profileService.ProfileExists(profileId))
             {
                 Response.StatusCode = 204;

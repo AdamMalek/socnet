@@ -1,6 +1,6 @@
 <div class="friend row">
     <div class="col-xs-4">
-        <img class="friend-avatar" [src]="friend.avatarSrc"/>
+        <img style="max-height: 50px; max-width: 50px;" class="friend-avatar" [src]="friend.avatarSrc"/>
     </div>
     <div class="friend-info col-xs-8">
         <h3><a [routerLink]="'/profile/'+friend.profileId + '/friends'">{{ fullName }}</a></h3>
