@@ -7,6 +7,7 @@ using socnet.Infrastructure.Extensions;
 using socnet.Models;
 using socnet.Models.DTO;
 using socnet.Infrastructure.Repository.Interfaces;
+using System.Linq.Expressions;
 
 namespace socnet.Infrastructure.Service
 {
@@ -102,17 +103,6 @@ namespace socnet.Infrastructure.Service
         {
             var post = _postRepository.GetPostById(postId);
             return toDTO(post);
-        }
-
-        public IEnumerable<PostDTO> GetPostsByGroup(string slug)
-        {
-            var posts = _postRepository.GetPostsWhere(x => x.Group.GroupSlug == slug);
-            return posts.Select(toDTO);
-        }
-
-        public IEnumerable<PostDTO> GetPostsByGroup(int groupId)
-        {
-            return _postRepository.GetPostsForGroup(groupId).Select(toDTO);
         }
 
         public IEnumerable<PostDTO> GetPostsByUser(int profileId)
@@ -255,6 +245,37 @@ namespace socnet.Infrastructure.Service
         public int GetCommentAuthorId(int postId)
         {
             return _commentRepository.GetCommentById(postId).ProfileId;
+        }
+
+        public IEnumerable<PostDTO> GetPosts(int groupId, int count, int skip, Expression<Func<Post, object>> orderBy,
+            Expression<Func<Post, bool>> predicate = null)
+        {
+            var group = _groupRepository.GetById(groupId, x => x.Posts);
+            return GetPosts(group, count, skip, orderBy, predicate);
+        }
+
+        public IEnumerable<PostDTO> GetPosts(string slug, int count, int skip, Expression<Func<Post, object>> orderBy,
+            Expression<Func<Post, bool>> predicate = null)
+        {
+            var group = _groupRepository.GetBySlug(slug, x => x.Posts);
+            return GetPosts(group, count, skip, orderBy, predicate);
+        }
+
+        private IEnumerable<PostDTO> GetPosts(Group group, int count, int skip, Expression<Func<Post, object>> orderBy, Expression<Func<Post, bool>> predicate = null)
+        {
+            if (group == null) return null;
+
+            var query = group.Posts.AsQueryable();
+            if (predicate != null)
+            {
+                query = query.Where(predicate);
+            }
+            if (orderBy != null)
+            {
+                query.OrderBy(orderBy);
+            }
+
+            return query.Skip(skip).Take(count).AsEnumerable().Select(toDTO);
         }
     }
 }

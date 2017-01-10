@@ -26,15 +26,8 @@ namespace socnet.Infrastructure.Service.Interfaces
         void SetName(int groupId, string newName);
         void SetName(string slug, string newName);
         void SetDescription(string slug, string description);
-        void SetDescription(int groupId, string description);
-
-        IEnumerable<Profile> GetMembers(int id);
-        IEnumerable<Profile> GetMembers(string slug);
-        IEnumerable<Profile> GetMembersWithRole(int id, MembershipLevel role);
-        IEnumerable<Profile> GetMembersWithRole(string slug, MembershipLevel role);
-
-        IEnumerable<Post> GetPosts(int groupId, int count, int skip, Expression<Func<Post,object>> orderBy ,Expression<Func<Post, bool>> predicate = null);
-        IEnumerable<Post> GetPosts(string slug, int count, int skip, Expression<Func<Post,object>> orderBy ,Expression<Func<Post, bool>> predicate = null);
+        void SetDescription(int groupId, string description);        
+        
         IEnumerable<GroupRequest> GetRequests(int groupId);
     }
 }

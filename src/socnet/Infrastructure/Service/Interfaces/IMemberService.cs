@@ -24,6 +24,11 @@ namespace socnet.Infrastructure.Service.Interfaces
 
         IEnumerable<Member> GetGroupMembers(int groupId, params Expression<Func<Member, object>>[] includes);
 
+        IEnumerable<Profile> GetMembers(int id);
+        IEnumerable<Profile> GetMembers(string slug);
+        IEnumerable<Profile> GetMembersWithRole(int id, MembershipLevel role);
+        IEnumerable<Profile> GetMembersWithRole(string slug, MembershipLevel role);
+
         IEnumerable<Member> GetMembers(Expression<Func<Member, bool>> predicate, params Expression<Func<Member, object>>[] includes);
     }
 }

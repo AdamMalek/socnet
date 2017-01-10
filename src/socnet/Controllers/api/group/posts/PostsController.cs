@@ -55,7 +55,7 @@ namespace socnet.Controllers
                 Response.WriteAsync("Error, group doesn't exist");
                 return null;
             }
-            return _postService.GetPostsByGroup(groupId.Value);
+            return _postService.GetPosts(groupId.Value,100,0,x=> x.DateCreated);
         }
 
         // GET: api/Posts/5

@@ -3,6 +3,7 @@ using socnet.Models.DTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace socnet.Infrastructure.Service.Interfaces
@@ -16,8 +17,10 @@ namespace socnet.Infrastructure.Service.Interfaces
 
         PostDTO GetPostById(int postId);
         IEnumerable<PostDTO> GetPostsByUser(int profileId);
-        IEnumerable<PostDTO> GetPostsByGroup(int groupId);
-        IEnumerable<PostDTO> GetPostsByGroup(string slug);
+        IEnumerable<PostDTO> GetPosts(int groupId, int count, int skip,
+            Expression<Func<Post, object>> orderBy, Expression<Func<Post, bool>> predicate = null);
+        IEnumerable<PostDTO> GetPosts(string slug, int count, int skip, Expression<Func<Post, object>> orderBy,
+            Expression<Func<Post, bool>> predicate = null);
 
         int GetPostAuthorId(int postId);
         int GetCommentAuthorId(int postId);

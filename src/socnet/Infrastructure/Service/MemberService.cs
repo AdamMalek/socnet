@@ -143,5 +143,34 @@ namespace socnet.Infrastructure.Service
                 throw new ArgumentException("Database error");
             }
         }
+
+        public IEnumerable<Profile> GetMembers(string slug)
+        {
+            return GetMembers(x => x.Group.GroupSlug == slug, x => x.Group).Select(x => x.Profile);
+        }
+
+        public IEnumerable<Profile> GetMembers(int id)
+        {
+            return GetGroupMembers(id).Select(x => x.Profile);
+        }
+
+        public IEnumerable<Profile> GetMembersWithRole(string slug, MembershipLevel role)
+        {
+            var group = _groupRepository.GetBySlug(slug, x => x.Members);
+            return GetMembersWithRole(group, role);
+        }
+
+        public IEnumerable<Profile> GetMembersWithRole(int id, MembershipLevel role)
+        {
+            var group = _groupRepository.GetById(id,x=> x.Members);
+            return GetMembersWithRole(group, role);
+        }
+
+        IEnumerable<Profile> GetMembersWithRole(Group group, MembershipLevel role)
+        {
+            if (group == null) return null;
+
+            return GetMembers(x => x.GroupId == group.GroupId && x.Role == role).Select(x => x.Profile);
+        }
     }
 }

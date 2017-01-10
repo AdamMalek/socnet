@@ -21,7 +21,7 @@ namespace socnet.Infrastructure.Service
         private readonly IProfileService _profileService;
         private readonly ConfigClass _cfg;
 
-        public UserService(IUserRepository userRepository,IProfileService profileService ,IOptions<ConfigClass> cfg)
+        public UserService(IUserRepository userRepository, IProfileService profileService, IOptions<ConfigClass> cfg)
         {
             _userRepository = userRepository;
             _profileService = profileService;
@@ -51,13 +51,14 @@ namespace socnet.Infrastructure.Service
 
         public User GetUserByEmail(string email, params Expression<Func<User, object>>[] includeProperties)
         {
-            return GetUsers(x => x.Profile.Email.ToLower().Equals(email.ToLower()),includeProperties).FirstOrDefault();
+            return GetUsers(x => x.Profile.Email.ToLower().Equals(email.ToLower()), includeProperties).FirstOrDefault();
         }
 
         public User RegisterUser(string username, string password, ProfileDTO profileData)
         {
-            if (username.Trim().Length == 0 || password.Length == 0) return null;
-            if (GetUserByEmail(profileData.Email) != null) return null;
+            if (username.Trim().Length == 0 || password.Length == 0) throw new ArgumentException("Invalid username!");
+            if (GetUserByEmail(profileData.Email) != null) throw new ArgumentException("Email is taken!");
+            if (GetUserByUserName(username) != null) throw new ArgumentException("Username is taken!");
             User user = new User
             {
                 Username = username.Trim(),
@@ -65,13 +66,20 @@ namespace socnet.Infrastructure.Service
                 Profile = _profileService.CreateProfile(profileData)
             };
             user.PasswordHash = Hash(password, user.Salt);
-            _userRepository.CreateUser(user);
-            return user;
+            try
+            {
+                _userRepository.CreateUser(user);
+                return user;
+            }
+            catch
+            {
+                throw;
+            }
         }
 
         private string Hash(string pass, string salt)
         {
-            var key = _cfg.CryptographicKey ?? "4e95f4b2ae1075e697695926a47c721d";
+            var key = _cfg.CryptographicKey;//  "4e95f4b2ae1075e697695926a47c721d";
             System.Security.Cryptography.HMACSHA384 crypto = new HMACSHA384(Encoding.ASCII.GetBytes(key));
             return Convert.ToBase64String(crypto.ComputeHash(Encoding.ASCII.GetBytes(salt + pass)));
         }
@@ -79,13 +87,10 @@ namespace socnet.Infrastructure.Service
         public User LoginUser(string username, string password)
         {
             var user = GetUserByUserName(username);
-            if (user == null) return null;
+            if (user == null) throw new ArgumentException("Username or password does not match!");
             var hashedPassword = Hash(password, user.Salt);
-            if (hashedPassword.Equals(user.PasswordHash))
-            {
-                return user;
-            }
-            return null;
+            if (!hashedPassword.Equals(user.PasswordHash)) throw new ArgumentException("Username or password does not match!");
+            return user;
         }
 
         public bool AddUserRole(int userId, string roleName)

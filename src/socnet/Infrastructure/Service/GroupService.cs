@@ -29,7 +29,9 @@ namespace socnet.Infrastructure.Service
         public Group CreateGroup(string name, int ownerId, string slug = null)
         {
             var user = _profileService.GetProfileById(ownerId);
-            if (user != null && !string.IsNullOrWhiteSpace(name))
+            if (user == null) throw new ArgumentException("Użytkownik nie istnieje");
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Podana nazwa nie jest prawidłowa");
+            else
             {
                 Group newGroup = new Group
                 {
@@ -48,16 +50,8 @@ namespace socnet.Infrastructure.Service
                         newGroup.GroupSlug = slug;
                     }
                 }
-                try
-                {
-                    return _groupRepository.CreateGroup(newGroup);
-                }
-                catch
-                {
-                    return null;
-                }
+                return _groupRepository.CreateGroup(newGroup);
             }
-            return null;
         }
 
         public Group GetGroupById(int id, params string[] scope)
@@ -134,15 +128,6 @@ namespace socnet.Infrastructure.Service
             }
         }
 
-        public IEnumerable<Profile> GetMembers(string slug)
-        {
-            return _memberService.GetMembers(x => x.Group.GroupSlug == slug, x => x.Group).Select(x => x.Profile);
-        }
-
-        public IEnumerable<Profile> GetMembers(int id)
-        {
-            return _memberService.GetGroupMembers(id).Select(x => x.Profile);
-        }
 
         public IEnumerable<Profile> GetMembersWithRole(string slug, MembershipLevel role)
         {
@@ -210,20 +195,6 @@ namespace socnet.Infrastructure.Service
             {
                 throw new ArgumentException("Database error!");
             }
-        }
-
-        public IEnumerable<Post> GetPosts(int groupId, int count, int skip, Expression<Func<Post, object>> orderBy,
-            Expression<Func<Post, bool>> predicate = null)
-        {
-            var group = GetGroupById(groupId, "posts");
-            return GetPosts(group, count, skip, orderBy, predicate);
-        }
-
-        public IEnumerable<Post> GetPosts(string slug, int count, int skip, Expression<Func<Post, object>> orderBy,
-            Expression<Func<Post, bool>> predicate = null)
-        {
-            var group = GetGroupBySlug(slug, "posts");
-            return GetPosts(group, count, skip, orderBy, predicate);
         }
 
         public IEnumerable<GroupRequest> GetRequests(int groupId)
