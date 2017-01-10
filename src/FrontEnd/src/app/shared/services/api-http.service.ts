@@ -10,8 +10,10 @@ export class ApiHttpService {
     constructor(private http: Http, private tokenService: TokenService) {
     }
 
+    log=false;
+
     post(url: string, body: any): Observable<Response> {
-        console.log('post: ' + url);
+        if (this.log) console.log('post: ' + url);
         let headers = new Headers({
             'Authorization': 'Bearer ' + this.tokenService.getAccessToken(),
             'Content-Type': 'application/x-www-form-urlencoded'
@@ -20,8 +22,18 @@ export class ApiHttpService {
         return this.http.post(BaseUrl + url, body, options);
     }
 
+    put(url: string, body: any): Observable<Response> {
+        if (this.log) console.log('post: ' + url);
+        let headers = new Headers({
+            'Authorization': 'Bearer ' + this.tokenService.getAccessToken(),
+            'Content-Type': 'application/x-www-form-urlencoded'
+        });
+        let options = new RequestOptions({headers: headers});
+        return this.http.put(BaseUrl + url, body, options);
+    }
+
     get(url: string): Observable<Response> {
-        console.log('get: ' + url);
+        if (this.log) console.log('get: ' + url);
         let headers = new Headers({
             'Authorization': 'Bearer ' + this.tokenService.getAccessToken(),
         });
@@ -30,7 +42,7 @@ export class ApiHttpService {
     }
 
     delete(url: string): Observable<Response> {
-        console.log('delete: ' + url);
+        if (this.log) console.log('delete: ' + url);
         let headers = new Headers({
             'Authorization': 'Bearer ' + this.tokenService.getAccessToken(),
         });

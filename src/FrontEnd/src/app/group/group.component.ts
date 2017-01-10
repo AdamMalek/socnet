@@ -1,5 +1,5 @@
 import {Component, OnInit, OnDestroy} from '@angular/core';
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {GroupService} from "../shared/services/group.service";
 import {Subscription} from "rxjs";
 import {EGroupStatus} from "./group-status.enum";
@@ -14,7 +14,7 @@ import {NotificationService} from "../shared/services/notification.service";
 export class GroupComponent implements OnInit,OnDestroy {
 
     constructor(private route: ActivatedRoute, private groupService: GroupService,
-                private userService:UserDataService, private notificationService:NotificationService) {
+                private userService:UserDataService, private notificationService:NotificationService, private router: Router) {
     }
     sub: Subscription;
     isMember = EGroupStatus.NotMember;
@@ -110,6 +110,7 @@ export class GroupComponent implements OnInit,OnDestroy {
                     this.isMember = EGroupStatus.NotMember;
                     this.userService.refreshToken();
                     this.ready = true;
+                    this.router.navigate(['/group/',this.groupId,'/posts']);
                 }
             },err=>{
                 this.notificationService.showErrorInformation(err.json().message);

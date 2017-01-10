@@ -4,3 +4,5 @@
         <socnet-friend-item [friend]="friend"></socnet-friend-item>
     </li>
 </ul>
+
+<h3 *ngIf="friends && friends.length == 0">This user has no friends</h3>

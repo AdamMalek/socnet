@@ -1,5 +1,10 @@
-<img style="max-height: 150px;" [src]="user.avatarSrc"/>
-<h1>{{ user.firstName + " " + user.lastName }}</h1>
-<h3>{{ user.university }}</h3>
+<h2>Profile Info:</h2>
+
+<img [src]="user.avatarSrc"/>
+<h3>{{ user.firstName+' '+user.lastName }}</h3>
+<h4>{{ user.email }}</h4>
+<h5>{{ user.university }}</h5>
+
+<socnet-profile-button [profileId]="profileId"></socnet-profile-button>
 
 <router-outlet></router-outlet>

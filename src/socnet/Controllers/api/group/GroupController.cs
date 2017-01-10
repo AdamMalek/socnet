@@ -15,14 +15,12 @@ namespace socnet.Controllers
     [Produces("application/json")]
     [Route("api/Group")]
     [Authorize]
-    public class GroupController : MyBaseController
+    public class GroupController : GroupBaseController
     {
-        private readonly IGroupService _groupService;
         private IMemberService _memberService;
 
-        public GroupController(IGroupService groupService, IMemberService memberService)
+        public GroupController(IGroupService groupService, IMemberService memberService):base(groupService)
         {
-            _groupService = groupService;
             _memberService = memberService;
         }
         // GET: api/Group/5
@@ -98,19 +96,30 @@ namespace socnet.Controllers
 
         // PUT: api/Group/5
         [HttpPut("{groupId:int}")]
+        [HttpPut("{slug}")]
         [Authorize(Roles = "GroupAdmin")]
-        public object Put(int groupId, GroupDTO data)
+        public object Put(int? groupId,string slug, GroupDTO data)
         {
-            if (data == null)
+            SetGroupId(slug,ref groupId);
+            if (data == null || !groupId.HasValue)
             {
                 Response.StatusCode = 400;
                 return new
                 {
                     success = false,
-                    message = "Bad Request (empty data)"
+                    message = "Bad Request"
                 };
             }
-            var group = _groupService.GetGroupById(groupId);
+            if (data.GroupName == null && data.GroupSlug == null && data.Description == null)
+            {
+                Response.StatusCode = 400;
+                return new
+                {
+                    success = false,
+                    message = "Cannot save empty data"
+                };
+            }
+            var group = _groupService.GetGroupById(groupId.Value);
             if (group == null)
             {
                 Response.StatusCode = 204;

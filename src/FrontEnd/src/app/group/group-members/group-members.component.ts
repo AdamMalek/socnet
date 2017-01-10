@@ -22,7 +22,6 @@ export class GroupMembersComponent implements OnInit, OnDestroy {
     loading = true;
 
     ngOnInit() {
-        this.notificationService.showInformation("XD");
         this.groupIdSub = this.route.parent.params.subscribe(params=>{
             this.groupId = params["groupId"];
             this.loading = true;
@@ -30,6 +29,8 @@ export class GroupMembersComponent implements OnInit, OnDestroy {
                 this.members = res.filter(x=> x.admin == false);
                 this.admins = res.filter(x=> x.admin == true);
                 this.loading = false;
+            },err=>{
+                this.notificationService.showErrorInformation(err);
             });
         });
     }
