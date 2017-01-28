@@ -79,7 +79,7 @@ namespace socnet.Infrastructure.Service
 
         private string Hash(string pass, string salt)
         {
-            var key = _cfg.CryptographicKey;//  "4e95f4b2ae1075e697695926a47c721d";
+            var key = /*_cfg.CryptographicKey;// */ "4e95f4b2ae1075e697695926a47c721d";
             System.Security.Cryptography.HMACSHA384 crypto = new HMACSHA384(Encoding.ASCII.GetBytes(key));
             return Convert.ToBase64String(crypto.ComputeHash(Encoding.ASCII.GetBytes(salt + pass)));
         }

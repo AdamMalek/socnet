@@ -63,7 +63,8 @@ namespace socnet.Infrastructure.Repository
             {
                 query = query.Include(x => x.Messages);
             }
-            return query.Where(x => (x.Member1Id == profile1Id && x.Member2Id == profile2Id) || (x.Member1Id == profile2Id && x.Member2Id == profile1Id)).SingleOrDefault();
+            return query.SingleOrDefault(x => (x.Member1Id == profile1Id && x.Member2Id == profile2Id)
+            || (x.Member1Id == profile2Id && x.Member2Id == profile1Id));
         }
 
         public IEnumerable<Conversation> GetProfileConversations(int profileId,bool messages)

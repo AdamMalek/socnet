@@ -201,8 +201,6 @@ namespace socnet.Infrastructure.Middleware
                 }
             }
             claims.AddRange(_userService.GetRoles(user.UserId).Select(role => new Claim(ClaimTypes.Role, role)));
-            //var roles = string.Join(",", _userService.GetRoles(user.UserId));
-            //claims.Add(new Claim(ClaimTypes.Role, roles));
 
             var ret = new ClaimsIdentity(claims);
             return Task.FromResult(ret);

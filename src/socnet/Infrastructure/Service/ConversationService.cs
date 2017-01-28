@@ -13,10 +13,12 @@ namespace socnet.Infrastructure.Service
     public class ConversationService : IConversationService
     {
         private IConversationRepository _convRepository;
+        private readonly INotificationService _notificationService;
         private readonly IProfileService _profileService;
 
-        public ConversationService(IConversationRepository convRepository, IProfileService profileService)
+        public ConversationService(IConversationRepository convRepository, IProfileService profileService, INotificationService not)
         {
+            _notificationService = not;
             _convRepository = convRepository;
             _profileService = profileService;
         }
@@ -48,12 +50,14 @@ namespace socnet.Infrastructure.Service
 
         public bool SendMessage(int friendId, MessageDTO msg)
         {
-            if (msg == null) return false;
-            if (string.IsNullOrWhiteSpace(msg.Message)) return false;
-            var conv = _convRepository.GetConversationBetween(msg.ProfileId,friendId);
+            if (msg == null) throw new ArgumentException("Message is null");
+            if (string.IsNullOrWhiteSpace(msg.Message)) throw new ArgumentException("Message is empty");
+            var conv = _convRepository.GetConversationBetween(msg.ProfileId, friendId);
             if (conv == null)
             {
-                if (!_profileService.ProfileExists(friendId) || !_profileService.AreFriends(msg.ProfileId, friendId)) return false;
+                if (!_profileService.ProfileExists(friendId) ||
+                    !_profileService.AreFriends(msg.ProfileId, friendId))
+                    throw new ArgumentException("Cannot send message to this person");
                 conv = new Conversation
                 {
                     Member1Id = msg.ProfileId,
@@ -70,15 +74,9 @@ namespace socnet.Infrastructure.Service
                 Date = DateTime.UtcNow,
                 ConversationId = conv.Id,
             };
-            try
-            {
-                _convRepository.AddMessage(message);
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+            var dbMessage = _convRepository.AddMessage(message);
+            _notificationService.SendMessageNotification(friendId, dbMessage.Id);
+            return true;
         }
     }
 }

@@ -50,7 +50,8 @@ export class UserDataService {
             if (response.status == 200) {
                 let tokenData = response.json();
                 this.tokenService.setTokens(tokenData);
-                this.scheduledTokenRefresh = setTimeout(()=>{this.refreshToken()},(tokenData.expires_in - this.secondsBeforeTokenExpires) * 1000);
+                this.scheduledTokenRefresh = setTimeout(()=>{this.refreshToken()},
+                    (tokenData.expires_in - this.secondsBeforeTokenExpires) * 1000);
                 let username= this.getClaim("sub");
                 let profileId = this.getClaim("userId");
                 this.onLogIn.emit({username: username, profileId: profileId});
@@ -102,7 +103,8 @@ export class UserDataService {
             if (response.status == 200) {
                 let tokenData = response.json();
                 this.tokenService.setAccessToken(tokenData.access_token);
-                this.scheduledTokenRefresh = setTimeout(()=>{this.refreshToken()},(tokenData.expires_in - this.secondsBeforeTokenExpires) * 1000);
+                this.scheduledTokenRefresh = setTimeout(()=>{this.refreshToken()},
+                    (tokenData.expires_in - this.secondsBeforeTokenExpires) * 1000);
             }
         });
     }

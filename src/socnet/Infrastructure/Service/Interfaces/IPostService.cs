@@ -19,8 +19,8 @@ namespace socnet.Infrastructure.Service.Interfaces
         IEnumerable<PostDTO> GetPostsByUser(int profileId);
         IEnumerable<PostDTO> GetPosts(int groupId, int count, int skip,
             Expression<Func<Post, object>> orderBy, Expression<Func<Post, bool>> predicate = null);
-        IEnumerable<PostDTO> GetPosts(string slug, int count, int skip, Expression<Func<Post, object>> orderBy,
-            Expression<Func<Post, bool>> predicate = null);
+        IEnumerable<PostDTO> GetPosts(string slug, int count, int skip,
+            Expression<Func<Post, object>> orderBy, Expression<Func<Post, bool>> predicate = null);
 
         int GetPostAuthorId(int postId);
         int GetCommentAuthorId(int postId);

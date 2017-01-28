@@ -34,7 +34,8 @@ export class GroupService {
     }
 
     hasSentMembershipRequest(groupId) {
-        return this.apiHttp.get('/api/group/' + groupId + '/request/' + this.userDataService.getClaim("userId")).map(x => x.json());
+        return this.apiHttp.get('/api/group/' + groupId + '/request/' +
+            + this.userDataService.getClaim("userId")).map(x => x.json());
     }
 
     getGroupData(groupId) {
