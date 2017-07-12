@@ -27,7 +27,7 @@ export class RegisterComponent implements OnInit {
     };
 
     submit(form: RegisterData) {
-        let data = new RegisterData(form.username,form.email,form.password,form.confirmPassword,form.firstName,form.lastName,form.university);
+        let data: RegisterData = new RegisterData(form.username,form.email,form.password,form.confirmPassword,form.firstName,form.lastName,form.university);
         this.errors = data.checkForValidationErrors();
         if (this.errors.count == 0) {
             this.userService.registerUser(data).map(x=> x.json()).subscribe(res=>{

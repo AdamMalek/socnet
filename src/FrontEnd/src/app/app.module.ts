@@ -65,7 +65,7 @@ import { ProfileButtonComponent } from './profile/profile-button/profile-button.
         FormsModule,
         HttpModule,
         RouterModule.forRoot(appRoutes),
-        MaterialModule.forRoot(),
+        MaterialModule,
     ],
     providers: [ProfileService, ApiHttpService,TokenService,
                 UserDataService, LoggedInGuard, GroupMemberGuard, GroupAdminGuard ,GroupService,

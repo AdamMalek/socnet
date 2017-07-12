@@ -4,13 +4,11 @@
 
 <h3 *ngIf="!loading && (requests.length == 0)">No requests</h3>
 
-<ul *ngIf="(requests.length > 0) && !loading">
-    <li *ngFor="let request of requests">
-        <div class="request">
+<div *ngIf="(requests.length > 0) && !loading">
+    <div class="request well col-xs-6 col-xs-offset-3" *ngFor="let request of requests">
             <p>{{ request.profile.firstName+' '+request.profile.lastName }}</p>
-            <button md-button (click)="accept(request.requestId)">Accept</button>
-            <button md-button (click)="decline(request.requestId)">Decline</button>
-        </div>
-    </li>
-</ul>
+            <button class="btn btn-success pull-left" (click)="accept(request.requestId)">Accept</button>
+            <button  class="btn btn-danger pull-right" (click)="decline(request.requestId)">Decline</button>
+    </div>
+</div>
 

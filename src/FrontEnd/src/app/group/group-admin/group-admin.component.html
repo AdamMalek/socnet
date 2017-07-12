@@ -1,17 +1,26 @@
 <h3>Settings:</h3>
 
-<span>Group name:</span><input type="text" value="{{ name }}" #nameField /><button class="btn btn-success" (click)="setName(nameField.value)">Save name</button><br>
-<span>Group slug:</span><input type="text" value="{{ slug }}" #slugField  /><button class="btn btn-success" (click)="setSlug(slugField.value)">Save slug</button><br>
-<span>Description:</span><textarea value="{{ description }}" #descriptionField ><br>
-</textarea><button class="btn btn-success" (click)="setDescription(descriptionField.value)">Save description</button>
+<span>Group name:</span><input class="form-control" type="text" value="{{ name }}" #nameField /><button class="pull-right btn btn-success" (click)="setName(nameField.value)">Save name</button><br>
+<span>Group slug:</span><input class="form-control" type="text" value="{{ slug }}" #slugField  /><button class="pull-right btn btn-success" (click)="setSlug(slugField.value)">Save slug</button><br>
+<span>Description:</span>
+<textarea class="form-control" value="{{ description }}" #descriptionField ><br>
+</textarea>
+<button class="btn btn-success pull-right" (click)="setDescription(descriptionField.value)">Save description</button>
 
 <h3>Members:</h3>
 
-<ul>
-    <li *ngFor="let member of members">
-        <p>{{ member.profile.firstName+' '+member.profile.lastName }}</p>
-        <button class="btn btn-success" *ngIf="!member.admin && (member.profile.profileId != userId)" (click)="makeAdmin(member.profile.profileId)">Set as admin</button>
-        <button class="btn btn-info" *ngIf="member.admin && (member.profile.profileId != userId)" (click)="removeAdmin(member.profile.profileId)">Remove admin role</button>
-        <button class="btn btn-danger" *ngIf="member.profile.profileId != userId" (click)="removeUser(member.profile.profileId)">Remove user</button>
-    </li>
-</ul>
+    <div class="row" *ngFor="let member of members">
+        <div class="well col-xs-6 col-xs-offset-2">
+            <div class="row">
+                <p class="text-center">{{ member.profile.firstName+' '+member.profile.lastName }}</p>
+            </div>
+            <div class="row">
+                <button class="btn btn-success pull-left" *ngIf="!member.admin && (member.profile.profileId != userId)" (click)="makeAdmin(member.profile.profileId)">Set as admin</button>
+                <button class="btn btn-info pull-left" *ngIf="member.admin && (member.profile.profileId != userId)" (click)="removeAdmin(member.profile.profileId)">Remove admin role</button>
+                <button class="btn btn-danger pull-right" *ngIf="member.profile.profileId != userId" (click)="removeUser(member.profile.profileId)">Remove user</button>
+            </div>
+        </div>
+    </div>
+<br/>
+<br/>
+<br/>

@@ -1,4 +1,8 @@
 <div class="container posts row" *ngIf="isMember">
+    <div class="form-group">
+        <textarea class="form-control"></textarea>
+        <button type="button" class="btn btn-info pull-right">Dodaj post</button>
+    </div>
     <div *ngIf="loading">
         loading posts.....
     </div>

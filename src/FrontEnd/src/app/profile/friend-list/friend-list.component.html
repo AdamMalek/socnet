@@ -1,8 +1,7 @@
 <h1>Friends</h1>
-<ul>
-    <li *ngFor="let friend of friends">
-        <socnet-friend-item [friend]="friend"></socnet-friend-item>
-    </li>
-</ul>
+
+<div *ngFor="let friend of friends">
+   <socnet-friend-item [friend]="friend"></socnet-friend-item>
+</div>
 
 <h3 *ngIf="friends && friends.length == 0">This user has no friends</h3>

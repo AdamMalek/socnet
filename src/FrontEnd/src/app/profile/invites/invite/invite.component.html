@@ -1,4 +1,7 @@
-<div class="invite row">
+<br/>
+<br/>
+
+<div class="invite col-xs-6 col-xs-offset-3 well">
     <div class="col-xs-4">
         <img class="friend-avatar" [src]="invite.friend.avatarSrc"/>
     </div>
@@ -7,7 +10,7 @@
         <h5>{{ invite.friend.university }}</h5>
     </div>
     <div class="friend-commands col-xs-4">
-        <button class="btn success" (click)="acceptInvite(invite.inviteId)">Accept</button>
+        <button class="btn btn-success" (click)="acceptInvite(invite.inviteId)">Accept</button>
         <button class="btn btn-danger" (click)="declineInvite(invite.inviteId)">Decline</button>
     </div>
 </div>

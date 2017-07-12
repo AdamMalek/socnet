@@ -47,7 +47,7 @@
     "System.IdentityModel.Tokens.Jwt": "5.0.0",
     "Microsoft.AspNetCore.Authentication.JwtBearer": "1.0.0",
     "Microsoft.EntityFrameworkCore": "1.0.1",
-    "Microsoft.AspNetCore.SignalR.Server": "0.2.0-*"
+    "Microsoft.AspNetCore.SignalR.Server": "0.2.0-rtm-22752"
   },
 
   "tools": {

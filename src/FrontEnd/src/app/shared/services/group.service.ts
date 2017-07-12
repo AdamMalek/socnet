@@ -6,6 +6,7 @@ import {resolveAvatarPath} from "./helpers";
 import {IGroupPost} from "../../group/group-posts/models/group-post.model";
 import {IGroupMember} from "../../group/group-members/models/group-member.model";
 import {IRequestResult} from "../models/request-result.model";
+import {URLSearchParams} from "@angular/http";
 
 @Injectable()
 export class GroupService {
@@ -80,6 +81,13 @@ export class GroupService {
             }
             return posts;
         });
+    }
+
+    ratePost(groupId,postId:number,rate:string){
+        let data:URLSearchParams = new URLSearchParams();
+        data.append('rate',rate);
+        let body = data.toString();
+        return this.apiHttp.post('/api/group/'+groupId+'/posts/'+ postId + '/rating',body);
     }
 
     isAdmin(slug): Observable<boolean> {
